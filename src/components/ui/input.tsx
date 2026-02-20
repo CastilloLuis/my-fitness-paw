@@ -18,6 +18,7 @@ interface InputProps extends TextInputProps {
   label: string;
   error?: string;
   containerStyle?: ViewStyle;
+  rightElement?: React.ReactNode;
 }
 
 const AnimatedView = Animated.createAnimatedComponent(View);
@@ -26,6 +27,7 @@ export function Input({
   label,
   error,
   containerStyle,
+  rightElement,
   onFocus,
   onBlur,
   value,
@@ -116,21 +118,25 @@ export function Input({
       >
         {label}
       </Animated.Text>
-      <TextInput
-        ref={inputRef}
-        value={value}
-        onFocus={handleFocus}
-        onBlur={handleBlur}
-        placeholderTextColor={theme.colors.textMuted}
-        selectionColor={theme.colors.primary}
-        style={{
-          fontFamily: theme.font.body,
-          fontSize: 16,
-          color: theme.colors.text,
-          padding: 0,
-        }}
-        {...props}
-      />
+      <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+        <TextInput
+          ref={inputRef}
+          value={value}
+          onFocus={handleFocus}
+          onBlur={handleBlur}
+          placeholderTextColor={theme.colors.textMuted}
+          selectionColor={theme.colors.primary}
+          style={{
+            flex: 1,
+            fontFamily: theme.font.body,
+            fontSize: 16,
+            color: theme.colors.text,
+            padding: 0,
+          }}
+          {...props}
+        />
+        {rightElement}
+      </View>
       {error && (
         <Text
           style={{

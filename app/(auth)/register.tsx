@@ -2,52 +2,72 @@ import React, { useState } from 'react';
 import {
   View,
   Text,
+  Pressable,
   KeyboardAvoidingView,
   ScrollView,
-  Platform,
 } from 'react-native';
 import { router } from 'expo-router';
+import { Image } from 'expo-image';
+import { Ionicons } from '@expo/vector-icons';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+
 import { signUp } from '@/src/supabase/auth';
 import { Input } from '@/src/components/ui/input';
 import { Button } from '@/src/components/ui/button';
 import { theme } from '@/src/theme';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function RegisterScreen() {
   const insets = useSafeAreaInsets();
   const [displayName, setDisplayName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [confirmationSent, setConfirmationSent] = useState(false);
 
+  const clearError = () => setError('');
+
   const handleRegister = async () => {
-    if (!email.trim() || !password.trim()) {
-      setError('Please fill in all fields');
+    if (!displayName.trim()) {
+      setError('Please enter your name');
+      return;
+    }
+    if (!email.trim()) {
+      setError('Please enter your email');
+      return;
+    }
+    if (!password) {
+      setError('Please enter a password');
       return;
     }
     if (password.length < 6) {
       setError('Password must be at least 6 characters');
       return;
     }
+    if (password !== confirmPassword) {
+      setError('Passwords do not match');
+      return;
+    }
     setLoading(true);
     setError('');
     try {
-      const result = await signUp(email.trim(), password, displayName.trim() || undefined);
+      const result = await signUp(email.trim(), password, displayName.trim());
       if (result.confirmationRequired) {
         setConfirmationSent(true);
       } else {
         router.replace('/(tabs)');
       }
     } catch (e: any) {
-      console.error('Registration error:', e);
       setError(e.message || 'Registration failed. Please try again.');
     } finally {
       setLoading(false);
     }
   };
 
+  // Confirmation sent screen
   if (confirmationSent) {
     return (
       <View
@@ -80,10 +100,11 @@ export default function RegisterScreen() {
             lineHeight: 22,
           }}
         >
-          We sent a confirmation link to {email}. Tap it to activate your account, then come back and sign in.
+          We sent a confirmation link to {email}. Tap it to activate your
+          account, then come back and log in.
         </Text>
         <Button
-          title="Back to Sign In"
+          title="Back to Log In"
           onPress={() => router.replace('/(auth)/login')}
           variant="secondary"
           style={{ marginTop: 8 }}
@@ -92,10 +113,25 @@ export default function RegisterScreen() {
     );
   }
 
+  const eyeIcon = (visible: boolean, toggle: () => void) => (
+    <Pressable
+      onPress={toggle}
+      hitSlop={12}
+      accessibilityRole="button"
+      accessibilityLabel={visible ? 'Hide password' : 'Show password'}
+    >
+      <Ionicons
+        name={visible ? 'eye-off-outline' : 'eye-outline'}
+        size={20}
+        color={theme.colors.textMuted}
+      />
+    </Pressable>
+  );
+
   return (
     <KeyboardAvoidingView
       style={{ flex: 1, backgroundColor: theme.colors.bg }}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      behavior={process.env.EXPO_OS === 'ios' ? 'padding' : undefined}
     >
       <ScrollView
         contentContainerStyle={{
@@ -107,14 +143,19 @@ export default function RegisterScreen() {
         }}
         keyboardShouldPersistTaps="handled"
       >
-        <View style={{ alignItems: 'center', marginBottom: 48 }}>
-          <Text style={{ fontSize: 56 }}>{'\u{1F43E}'}</Text>
+        {/* Brand hero */}
+        <View style={{ alignItems: 'center', marginBottom: 32 }}>
+          <Image
+            source={require('@/assets/icons/paw.png')}
+            style={{ width: 100, height: 100 }}
+            contentFit="contain"
+          />
           <Text
             style={{
               fontFamily: theme.font.display,
-              fontSize: 32,
+              fontSize: 26,
               color: theme.colors.text,
-              marginTop: 12,
+              marginTop: 14,
             }}
           >
             Join the Pack
@@ -131,40 +172,56 @@ export default function RegisterScreen() {
           </Text>
         </View>
 
+        {/* Form */}
         <View style={{ gap: 16 }}>
           <Input
-            label="Display Name"
+            label="Name"
             value={displayName}
-            onChangeText={setDisplayName}
+            onChangeText={(text) => { setDisplayName(text); clearError(); }}
             autoCapitalize="words"
             textContentType="name"
+            returnKeyType="next"
           />
           <Input
             label="Email"
             value={email}
-            onChangeText={setEmail}
+            onChangeText={(text) => { setEmail(text); clearError(); }}
             autoCapitalize="none"
             keyboardType="email-address"
             textContentType="emailAddress"
             autoComplete="email"
+            returnKeyType="next"
           />
           <Input
             label="Password"
             value={password}
-            onChangeText={setPassword}
-            secureTextEntry
+            onChangeText={(text) => { setPassword(text); clearError(); }}
+            secureTextEntry={!showPassword}
             textContentType="newPassword"
             autoComplete="new-password"
+            returnKeyType="next"
+            rightElement={eyeIcon(showPassword, () => setShowPassword(!showPassword))}
+          />
+          <Input
+            label="Confirm Password"
+            value={confirmPassword}
+            onChangeText={(text) => { setConfirmPassword(text); clearError(); }}
+            secureTextEntry={!showConfirm}
+            textContentType="newPassword"
+            returnKeyType="go"
+            onSubmitEditing={handleRegister}
+            rightElement={eyeIcon(showConfirm, () => setShowConfirm(!showConfirm))}
           />
 
+          {/* Error banner */}
           {!!error && (
             <View
               style={{
-                backgroundColor: theme.colors.danger + '15',
+                backgroundColor: theme.colors.danger + '12',
                 borderRadius: theme.radius.md,
                 padding: 12,
                 borderWidth: 1,
-                borderColor: theme.colors.danger + '30',
+                borderColor: theme.colors.danger + '25',
                 borderCurve: 'continuous',
               }}
             >
@@ -175,26 +232,46 @@ export default function RegisterScreen() {
                   color: theme.colors.danger,
                   textAlign: 'center',
                 }}
-                selectable
               >
                 {error}
               </Text>
             </View>
           )}
 
+          {/* Primary CTA */}
           <Button
             title="Create Account"
             onPress={handleRegister}
             loading={loading}
             style={{ marginTop: 8 }}
           />
-
-          <Button
-            title="Already have an account? Sign in"
-            onPress={() => router.back()}
-            variant="ghost"
-          />
         </View>
+
+        {/* Secondary CTA */}
+        <Pressable
+          onPress={() => router.back()}
+          accessibilityRole="button"
+          accessibilityLabel="Go to login"
+          style={{ marginTop: 24, alignItems: 'center', paddingVertical: 12 }}
+        >
+          <Text
+            style={{
+              fontFamily: theme.font.body,
+              fontSize: 15,
+              color: theme.colors.textMuted,
+            }}
+          >
+            Already have an account?{' '}
+            <Text
+              style={{
+                fontFamily: theme.font.bodySemiBold,
+                color: theme.colors.primary,
+              }}
+            >
+              Log in
+            </Text>
+          </Text>
+        </Pressable>
       </ScrollView>
     </KeyboardAvoidingView>
   );
