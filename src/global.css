@@ -1,0 +1,53 @@
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/preflight.css" layer(base);
+@import "tailwindcss/utilities.css";
+
+@media android {
+  :root {
+    --font-mono: monospace;
+    --font-rounded: normal;
+    --font-serif: serif;
+    --font-sans: normal;
+  }
+}
+
+@media ios {
+  :root {
+    --font-mono: ui-monospace;
+    --font-serif: ui-serif;
+    --font-sans: system-ui;
+    --font-rounded: ui-rounded;
+  }
+}
+
+@layer theme {
+  @theme {
+    /* Calico Neutrals */
+    --color-ivory-50: #FBFAF7;
+    --color-ivory-100: #F3EFE7;
+    --color-taupe-200: #E5D9C8;
+    --color-taupe-300: #CBBBA4;
+    --color-ink-800: #2C2A27;
+    --color-ink-900: #141311;
+
+    /* Calico Gingers */
+    --color-ginger-400: #F2B36D;
+    --color-ginger-500: #E98A2A;
+    --color-ginger-600: #CC6A1E;
+    --color-ginger-700: #A94F18;
+
+    /* Calico Browns */
+    --color-cinnamon-600: #8A5A3C;
+    --color-cocoa-700: #5A3A2E;
+
+    /* Dilute accents */
+    --color-blue-gray: #6F7A86;
+    --color-cream-200: #F1DFC6;
+
+    /* Semantic */
+    --color-success: #2F7D57;
+    --color-warning: #E98A2A;
+    --color-danger: #B33A2B;
+    --color-muted: #5B564F;
+  }
+}
