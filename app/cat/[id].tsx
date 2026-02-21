@@ -12,10 +12,10 @@ import { estimateRER, generateCatInsights, playCaloriesAsPercentOfRER, yearsToMo
 
 import { CatFormSheet } from '@/src/components/cats/cat-form-sheet';
 import { StatRow } from '@/src/components/insights/stat-row';
+import { WeeklyRings } from '@/src/components/insights/weekly-rings';
 import { Avatar } from '@/src/components/ui/avatar';
 import { Badge } from '@/src/components/ui/badge';
 import { Card } from '@/src/components/ui/card';
-import { ProgressRing } from '@/src/components/ui/progress-ring';
 import { Skeleton } from '@/src/components/ui/skeleton';
 import type { Cat, PlaySession } from '@/src/supabase/types';
 import { theme } from '@/src/theme';
@@ -287,11 +287,6 @@ export default function CatProfileScreen() {
   const rer = estimateRER(cat.weight_kg ?? 4.5);
   const lifeStageInfo = LIFE_STAGE_LABELS[play_plan.life_stage] ?? { label: play_plan.life_stage, emoji: '\u{1F431}' };
 
-  // Progress: today's minutes vs daily recommended
-  const todayMinutes = todaySessions?.reduce((sum, s) => sum + s.duration_minutes, 0) ?? 0;
-  const targetMinutes = play_plan.total_minutes_per_day_range.max;
-  const progress = targetMinutes > 0 ? Math.min(todayMinutes / targetMinutes, 1) : 0;
-
   const topToys = toy_recommendations.slice(0, 5);
 
   return (
@@ -414,39 +409,11 @@ export default function CatProfileScreen() {
         {/* Progress */}
         <View style={{ paddingHorizontal: theme.spacing.md }}>
           <SectionHeader title="Progress" emoji={'\u{1F3AF}'} delay={100} />
-          <Animated.View entering={FadeInDown.delay(150).duration(400)}>
-            <Card elevated style={{ alignItems: 'center', gap: 16 }}>
-              <ProgressRing
-                progress={progress}
-                size={130}
-                strokeWidth={12}
-                color={progress >= 1 ? theme.colors.success : theme.colors.primary}
-                label={`${todayMinutes}`}
-                sublabel={`of ${rangeStr(play_plan.total_minutes_per_day_range)} min`}
-              />
-              <View style={{ flexDirection: 'row', gap: 24 }}>
-                <View style={{ alignItems: 'center' }}>
-                  <Text style={{ fontFamily: theme.font.bodySemiBold, fontSize: 18, color: theme.colors.text, fontVariant: ['tabular-nums'] }}>
-                    {todaySessions?.length ?? 0}
-                  </Text>
-                  <Text style={{ fontFamily: theme.font.body, fontSize: 12, color: theme.colors.textMuted }}>
-                    sessions
-                  </Text>
-                </View>
-                <View style={{ width: 1, backgroundColor: theme.colors.borderSubtle }} />
-                <View style={{ alignItems: 'center' }}>
-                  <Text style={{ fontFamily: theme.font.bodySemiBold, fontSize: 18, color: theme.colors.text, fontVariant: ['tabular-nums'] }}>
-                    {today_calories
-                      ? `${today_calories.total_estimated_kcal.min}–${today_calories.total_estimated_kcal.max}`
-                      : '0'}
-                  </Text>
-                  <Text style={{ fontFamily: theme.font.body, fontSize: 12, color: theme.colors.textMuted }}>
-                    kcal burned
-                  </Text>
-                </View>
-              </View>
-            </Card>
-          </Animated.View>
+          <WeeklyRings
+            sessions={allSessions ?? []}
+            targetMinutes={play_plan.total_minutes_per_day_range.max}
+            streak={streak}
+          />
         </View>
 
         {/* Play Plan */}
