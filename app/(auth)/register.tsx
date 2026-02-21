@@ -58,7 +58,7 @@ export default function RegisterScreen() {
       if (result.confirmationRequired) {
         setConfirmationSent(true);
       } else {
-        router.replace('/(tabs)');
+        router.replace('/onboarding');
       }
     } catch (e: any) {
       setError(e.message || 'Registration failed. Please try again.');

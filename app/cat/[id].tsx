@@ -242,8 +242,9 @@ export default function CatProfileScreen() {
 
   const cat = cats?.find((c) => c.id === id);
 
-  // Derive today's sessions from all sessions
-  const todayStr = new Date().toISOString().slice(0, 10);
+  // Derive today's sessions from all sessions (local date, not UTC)
+  const now = new Date();
+  const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
   const todaySessions = useMemo(
     () => allSessions?.filter((s) => s.played_at.slice(0, 10) === todayStr),
     [allSessions, todayStr]
@@ -286,7 +287,7 @@ export default function CatProfileScreen() {
   const rer = estimateRER(cat.weight_kg ?? 4.5);
   const lifeStageInfo = LIFE_STAGE_LABELS[play_plan.life_stage] ?? { label: play_plan.life_stage, emoji: '\u{1F431}' };
 
-  // Progress: today's minutes vs recommended
+  // Progress: today's minutes vs daily recommended
   const todayMinutes = todaySessions?.reduce((sum, s) => sum + s.duration_minutes, 0) ?? 0;
   const targetMinutes = play_plan.total_minutes_per_day_range.max;
   const progress = targetMinutes > 0 ? Math.min(todayMinutes / targetMinutes, 1) : 0;
@@ -410,9 +411,9 @@ export default function CatProfileScreen() {
           </View>
         )}
 
-        {/* Today's Progress */}
+        {/* Progress */}
         <View style={{ paddingHorizontal: theme.spacing.md }}>
-          <SectionHeader title="Today's Progress" emoji={'\u{1F3AF}'} delay={100} />
+          <SectionHeader title="Progress" emoji={'\u{1F3AF}'} delay={100} />
           <Animated.View entering={FadeInDown.delay(150).duration(400)}>
             <Card elevated style={{ alignItems: 'center', gap: 16 }}>
               <ProgressRing

@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Stack, router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
@@ -13,6 +13,7 @@ import {
   DMSans_600SemiBold,
 } from '@expo-google-fonts/dm-sans';
 import * as SplashScreen from 'expo-splash-screen';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { useAuth } from '@/src/hooks/use-auth';
 import { theme } from '@/src/theme';
@@ -31,17 +32,34 @@ export const unstable_settings = {
   anchor: '(tabs)',
 };
 
+const ONBOARDING_KEY = '@myfitnesspaw:onboarding_done';
+
 function AuthGate({ children }: { children: React.ReactNode }) {
   const { loading, isAuthenticated } = useAuth();
+  const [onboardingChecked, setOnboardingChecked] = useState(false);
+  const [hasOnboarded, setHasOnboarded] = useState(false);
 
   useEffect(() => {
-    if (!loading) {
+    if (!loading && isAuthenticated) {
+      AsyncStorage.getItem(ONBOARDING_KEY).then((value) => {
+        setHasOnboarded(value === 'true');
+        setOnboardingChecked(true);
+      });
+    } else if (!loading) {
+      setOnboardingChecked(true);
+    }
+  }, [loading, isAuthenticated]);
+
+  useEffect(() => {
+    if (!loading && onboardingChecked) {
       if (!isAuthenticated) {
         router.replace('/(auth)/login');
+      } else if (!hasOnboarded) {
+        router.replace('/onboarding');
       }
       SplashScreen.hideAsync();
     }
-  }, [loading, isAuthenticated]);
+  }, [loading, isAuthenticated, onboardingChecked, hasOnboarded]);
 
   return <>{children}</>;
 }
@@ -74,6 +92,13 @@ export default function RootLayout() {
           >
             <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
             <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+            <Stack.Screen
+              name="onboarding"
+              options={{
+                headerShown: false,
+                animation: 'fade',
+              }}
+            />
             <Stack.Screen
               name="cat/[id]"
               options={{

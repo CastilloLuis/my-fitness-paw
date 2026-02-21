@@ -13,11 +13,12 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useQueryClient, useMutation } from '@tanstack/react-query';
 import { Ionicons } from '@expo/vector-icons';
 import Constants from 'expo-constants';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { useAuth } from '@/src/hooks/use-auth';
 import { useProfile } from '@/src/hooks/use-profile';
 import { updateProfile } from '@/src/supabase/queries/profiles';
-import { signOut } from '@/src/supabase/auth';
+import { signOut, deleteAccount } from '@/src/supabase/auth';
 import { queryKeys } from '@/src/constants/query-keys';
 import { theme } from '@/src/theme';
 
@@ -136,6 +137,7 @@ export default function SettingsScreen() {
   const [editingName, setEditingName] = useState(false);
   const [nameValue, setNameValue] = useState('');
   const [loggingOut, setLoggingOut] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   const updateNameMutation = useMutation({
     mutationFn: (name: string) => updateProfile(userId!, { display_name: name }),
@@ -179,12 +181,49 @@ export default function SettingsScreen() {
 
   const handleDeleteAccount = () => {
     Alert.alert(
-      'Delete Account',
-      'Account deletion requires contacting support. This action cannot be undone.\n\nPlease email support@myfitnesspaw.app to request account deletion.',
-      [{ text: 'OK', style: 'default' }]
+      'Delete Account?',
+      'All your data including cats and play sessions will be permanently deleted.',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Continue',
+          style: 'destructive',
+          onPress: () => {
+            Alert.alert(
+              'Are you sure?',
+              'This cannot be undone.',
+              [
+                { text: 'Cancel', style: 'cancel' },
+                {
+                  text: 'Delete My Account',
+                  style: 'destructive',
+                  onPress: async () => {
+                    setDeleting(true);
+                    try {
+                      await deleteAccount();
+                      await AsyncStorage.removeItem('@myfitnesspaw:onboarding_done');
+                      queryClient.clear();
+                      router.replace('/(auth)/login');
+                    } catch {
+                      setDeleting(false);
+                      Alert.alert('Error', 'Failed to delete account. Please try again.');
+                    }
+                  },
+                },
+              ]
+            );
+          },
+        },
+      ]
     );
   };
 
+  const handleResetOnboarding = async () => {
+    await AsyncStorage.removeItem('@myfitnesspaw:onboarding_done');
+    Alert.alert('Done', 'Onboarding reset. Restart the app to see it.');
+  };
+
+  const isDev = process.env.EXPO_PUBLIC_IS_DEV === 'true';
   const appVersion = Constants.expoConfig?.version ?? '1.0.0';
   const displayName = profile?.display_name || 'Set your name';
 
@@ -339,8 +378,8 @@ export default function SettingsScreen() {
           <Divider />
           <SettingsRow
             icon="trash-outline"
-            label="Delete Account"
-            onPress={handleDeleteAccount}
+            label={deleting ? 'Deleting...' : 'Delete Account'}
+            onPress={deleting ? undefined : handleDeleteAccount}
             destructive
           />
         </SettingsCard>
@@ -368,6 +407,20 @@ export default function SettingsScreen() {
             </Text>
           </View>
         </SettingsCard>
+
+        {/* Dev tools — only visible when EXPO_PUBLIC_IS_DEV=true */}
+        {isDev && (
+          <>
+            <SectionHeader title="Developer" />
+            <SettingsCard>
+              <SettingsRow
+                icon="refresh-outline"
+                label="Reset Onboarding"
+                onPress={handleResetOnboarding}
+              />
+            </SettingsCard>
+          </>
+        )}
       </ScrollView>
     </View>
   );

@@ -63,3 +63,8 @@ export async function getSession() {
   if (error) throw error;
   return data.session;
 }
+
+export async function deleteAccount() {
+  const { error } = await supabase.rpc('delete_user_account');
+  if (error) throw error;
+}
