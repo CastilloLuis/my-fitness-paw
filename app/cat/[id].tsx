@@ -1,24 +1,24 @@
+import { router, useLocalSearchParams } from 'expo-router';
 import React, { useMemo, useState } from 'react';
-import { View, Text, ScrollView, Pressable, Modal } from 'react-native';
+import { Modal, Pressable, ScrollView, Text, View } from 'react-native';
 import Animated, { FadeInDown, FadeInRight } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useLocalSearchParams, router } from 'expo-router';
 
 import { useCats } from '@/src/hooks/use-cats';
-import { useSessionsByCat, useTodaySessions, useWeeklySessions } from '@/src/hooks/use-sessions';
+import { useSessionsByCat } from '@/src/hooks/use-sessions';
 import { useStreak } from '@/src/hooks/use-streak';
-import { generateCatInsights, yearsToMonths, estimateRER, playCaloriesAsPercentOfRER } from '@/src/lib/cat-fitness';
-import type { CatProfile, CatInsights, ToyRecommendation, Range } from '@/src/lib/cat-fitness';
+import type { CatInsights, CatProfile, Range, ToyRecommendation } from '@/src/lib/cat-fitness';
+import { estimateRER, generateCatInsights, playCaloriesAsPercentOfRER, yearsToMonths } from '@/src/lib/cat-fitness';
 
-import { Card } from '@/src/components/ui/card';
-import { Badge } from '@/src/components/ui/badge';
+import { CatFormSheet } from '@/src/components/cats/cat-form-sheet';
+import { StatRow } from '@/src/components/insights/stat-row';
 import { Avatar } from '@/src/components/ui/avatar';
+import { Badge } from '@/src/components/ui/badge';
+import { Card } from '@/src/components/ui/card';
 import { ProgressRing } from '@/src/components/ui/progress-ring';
 import { Skeleton } from '@/src/components/ui/skeleton';
-import { StatRow } from '@/src/components/insights/stat-row';
-import { CatFormSheet } from '@/src/components/cats/cat-form-sheet';
-import { theme } from '@/src/theme';
 import type { Cat, PlaySession } from '@/src/supabase/types';
+import { theme } from '@/src/theme';
 
 // --- Helpers ---
 
@@ -599,7 +599,7 @@ export default function CatProfileScreen() {
                       Week {week.week}
                     </Text>
                     <Badge
-                      label={`${week.sessions_per_day}x/day \u00B7 ${rangeStr(week.minutes_per_session)} min`}
+                      label={`${week.sessions_per_day}x/day - ${rangeStr(week.minutes_per_session)} min`}
                       color={theme.colors.taupe200}
                       textColor={theme.colors.textSecondary}
                     />

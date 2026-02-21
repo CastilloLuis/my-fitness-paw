@@ -1,21 +1,21 @@
+import { router } from 'expo-router';
 import React, { useState } from 'react';
-import { View, Text, ScrollView, Modal, Pressable } from 'react-native';
+import { Modal, Pressable, ScrollView, Text, View } from 'react-native';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { router } from 'expo-router';
 
-import { useCats, useDeleteCat } from '@/src/hooks/use-cats';
-import { useSessionsByCat } from '@/src/hooks/use-sessions';
-import { useStreak } from '@/src/hooks/use-streak';
-import { Card } from '@/src/components/ui/card';
+import { CatFormSheet } from '@/src/components/cats/cat-form-sheet';
 import { Avatar } from '@/src/components/ui/avatar';
 import { Badge } from '@/src/components/ui/badge';
 import { Button } from '@/src/components/ui/button';
-import { Skeleton } from '@/src/components/ui/skeleton';
+import { Card } from '@/src/components/ui/card';
 import { EmptyState } from '@/src/components/ui/empty-state';
-import { CatFormSheet } from '@/src/components/cats/cat-form-sheet';
-import { theme } from '@/src/theme';
+import { Skeleton } from '@/src/components/ui/skeleton';
+import { useCats, useDeleteCat } from '@/src/hooks/use-cats';
+import { useSessionsByCat } from '@/src/hooks/use-sessions';
+import { useStreak } from '@/src/hooks/use-streak';
 import type { Cat } from '@/src/supabase/types';
+import { theme } from '@/src/theme';
 
 function CatListItem({ cat, onEdit }: { cat: Cat; onEdit: () => void }) {
   const { data: sessions } = useSessionsByCat(cat.id);
@@ -97,7 +97,7 @@ function CatListItem({ cat, onEdit }: { cat: Cat; onEdit: () => void }) {
             color: theme.colors.textMuted,
           }}
         >
-          {totalSessions} sessions \u00B7 {totalMinutes} min total
+          {totalSessions} sessions - {totalMinutes} min total
         </Text>
         <View style={{ flexDirection: 'row', gap: 16 }}>
           <Pressable

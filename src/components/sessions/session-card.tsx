@@ -1,10 +1,10 @@
-import React from 'react';
-import { View, Text, Pressable } from 'react-native';
-import Animated, { FadeInLeft } from 'react-native-reanimated';
-import { format } from 'date-fns';
-import { getActivityType } from '@/src/utils/activity-types';
+import type { Cat, PlaySession } from '@/src/supabase/types';
 import { theme } from '@/src/theme';
-import type { PlaySession, Cat } from '@/src/supabase/types';
+import { getActivityType } from '@/src/utils/activity-types';
+import { format } from 'date-fns';
+import React from 'react';
+import { Pressable, Text, View } from 'react-native';
+import Animated, { FadeInLeft } from 'react-native-reanimated';
 
 interface SessionCardProps {
   session: PlaySession;
@@ -62,8 +62,8 @@ export function SessionCard({ session, cat, onDelete, index = 0 }: SessionCardPr
             marginTop: 2,
           }}
         >
-          {cat?.name ? `${cat.emoji} ${cat.name} \u00B7 ` : ''}
-          {session.duration_minutes} min \u00B7 {time}
+          {cat?.name ? `${cat.emoji} ${cat.name} - ` : ''}
+          {session.duration_minutes} min - {time}
         </Text>
         {session.notes && (
           <Text
