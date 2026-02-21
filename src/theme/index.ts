@@ -36,10 +36,11 @@ export const theme = {
     full: 9999,
   },
   font: {
-    display: 'PlayfairDisplay-Bold',
-    body: 'DMSans-Regular',
-    bodyMedium: 'DMSans-Medium',
-    bodySemiBold: 'DMSans-SemiBold',
+    display: 'PlusJakartaSans-ExtraBold',
+    displayBold: 'PlusJakartaSans-Bold',
+    body: 'PlusJakartaSans-Regular',
+    bodyMedium: 'PlusJakartaSans-Medium',
+    bodySemiBold: 'PlusJakartaSans-SemiBold',
   },
   shadow: {
     sm: {

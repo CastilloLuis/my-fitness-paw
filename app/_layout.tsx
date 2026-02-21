@@ -5,13 +5,12 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import {
   useFonts,
-  PlayfairDisplay_700Bold,
-} from '@expo-google-fonts/playfair-display';
-import {
-  DMSans_400Regular,
-  DMSans_500Medium,
-  DMSans_600SemiBold,
-} from '@expo-google-fonts/dm-sans';
+  PlusJakartaSans_400Regular,
+  PlusJakartaSans_500Medium,
+  PlusJakartaSans_600SemiBold,
+  PlusJakartaSans_700Bold,
+  PlusJakartaSans_800ExtraBold,
+} from '@expo-google-fonts/plus-jakarta-sans';
 import * as SplashScreen from 'expo-splash-screen';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -66,10 +65,11 @@ function AuthGate({ children }: { children: React.ReactNode }) {
 
 export default function RootLayout() {
   const [fontsLoaded] = useFonts({
-    'PlayfairDisplay-Bold': PlayfairDisplay_700Bold,
-    'DMSans-Regular': DMSans_400Regular,
-    'DMSans-Medium': DMSans_500Medium,
-    'DMSans-SemiBold': DMSans_600SemiBold,
+    'PlusJakartaSans-Regular': PlusJakartaSans_400Regular,
+    'PlusJakartaSans-Medium': PlusJakartaSans_500Medium,
+    'PlusJakartaSans-SemiBold': PlusJakartaSans_600SemiBold,
+    'PlusJakartaSans-Bold': PlusJakartaSans_700Bold,
+    'PlusJakartaSans-ExtraBold': PlusJakartaSans_800ExtraBold,
   });
 
   useEffect(() => {
