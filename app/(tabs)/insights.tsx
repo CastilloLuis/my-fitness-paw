@@ -1,16 +1,16 @@
 import React, { useMemo } from 'react';
-import { View, Text, ScrollView } from 'react-native';
+import { ScrollView, Text, View } from 'react-native';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { StatRow } from '@/src/components/insights/stat-row';
+import { WeeklyBar } from '@/src/components/insights/weekly-bar';
+import { Avatar } from '@/src/components/ui/avatar';
+import { Card } from '@/src/components/ui/card';
+import { EmptyState } from '@/src/components/ui/empty-state';
+import { Skeleton } from '@/src/components/ui/skeleton';
 import { useCats } from '@/src/hooks/use-cats';
 import { useWeeklySessions } from '@/src/hooks/use-sessions';
-import { Card } from '@/src/components/ui/card';
-import { Skeleton } from '@/src/components/ui/skeleton';
-import { EmptyState } from '@/src/components/ui/empty-state';
-import { WeeklyBar } from '@/src/components/insights/weekly-bar';
-import { StatRow } from '@/src/components/insights/stat-row';
-import { Avatar } from '@/src/components/ui/avatar';
 import { theme } from '@/src/theme';
 import { ACTIVITY_TYPES } from '@/src/utils/activity-types';
 
@@ -192,7 +192,7 @@ export default function InsightsScreen() {
                               fontVariant: ['tabular-nums'],
                             }}
                           >
-                            {count} sessions \u00B7 {minutes} min
+                            {count} sessions - {minutes} min
                           </Text>
                         </View>
                       </View>
