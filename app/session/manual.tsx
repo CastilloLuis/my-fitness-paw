@@ -15,6 +15,7 @@ import * as Haptics from 'expo-haptics';
 import { useCats } from '@/src/hooks/use-cats';
 import { useCreateSession } from '@/src/hooks/use-sessions';
 import { ACTIVITY_TYPES } from '@/src/utils/activity-types';
+import { Avatar } from '@/src/components/ui/avatar';
 import { Input } from '@/src/components/ui/input';
 import { Button } from '@/src/components/ui/button';
 import { Skeleton } from '@/src/components/ui/skeleton';
@@ -171,7 +172,7 @@ export default function ManualLogScreen() {
                         borderCurve: 'continuous',
                       }}
                     >
-                      <Text style={{ fontSize: 28 }}>{cat.emoji}</Text>
+                      <Avatar emoji={cat.emoji} imageBase64={cat.image_base64} size={36} />
                       <Text
                         numberOfLines={1}
                         style={{

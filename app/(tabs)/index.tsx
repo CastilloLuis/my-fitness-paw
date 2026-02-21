@@ -1,8 +1,8 @@
+import { Image } from 'expo-image';
 import { router } from 'expo-router';
 import React, { useMemo } from 'react';
 import { Pressable, ScrollView, Text, View } from 'react-native';
 import Animated, { FadeInDown } from 'react-native-reanimated';
-import { Image } from 'expo-image';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Ionicons } from '@expo/vector-icons';
@@ -12,15 +12,14 @@ import { InsightCard } from '@/src/components/insights/insight-card';
 import { SessionCard } from '@/src/components/sessions/session-card';
 import { Button } from '@/src/components/ui/button';
 import { Card } from '@/src/components/ui/card';
-import { EmptyState } from '@/src/components/ui/empty-state';
 import { ProgressRing } from '@/src/components/ui/progress-ring';
 import { Skeleton } from '@/src/components/ui/skeleton';
 import { useCats } from '@/src/hooks/use-cats';
 import { useProfile } from '@/src/hooks/use-profile';
 import { useSessions, useTodaySessions } from '@/src/hooks/use-sessions';
 import { useStreak } from '@/src/hooks/use-streak';
-import { generateInsights } from '@/src/lib/insights/generate-insights';
 import { calculateDailyCalories } from '@/src/lib/cat-fitness';
+import { generateInsights } from '@/src/lib/insights/generate-insights';
 import { theme } from '@/src/theme';
 
 const DAILY_GOAL = 30;
@@ -97,20 +96,27 @@ export default function HomeScreen() {
             style={{
               flexDirection: 'row',
               justifyContent: 'space-between',
-              alignItems: 'flex-start',
+              alignItems: 'center',
             }}
           >
             <View style={{ flex: 1 }}>
-              <Text
-                style={{
-                  fontFamily: theme.font.display,
-                  fontSize: 26,
-                  color: theme.colors.text,
-                }}
-              >
-                {getGreeting()}! {'\u{1F43E}'}
-              </Text>
-              <Text
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                <Text
+                  style={{
+                    fontFamily: theme.font.display,
+                    fontSize: 26,
+                    color: theme.colors.text,
+                  }}
+                >
+                  {getGreeting()}!
+                </Text>
+                <Image
+                  source={require('@/assets/icons/two-paws.png')}
+                  style={{ width: 35, height: 35 }}
+                  contentFit="contain"
+                />
+              </View>
+              {/* <Text
                 style={{
                   fontFamily: theme.font.body,
                   fontSize: 15,
@@ -119,7 +125,7 @@ export default function HomeScreen() {
                 }}
               >
                 {displayName}
-              </Text>
+              </Text> */}
             </View>
             <Pressable
               onPress={() => router.push('/settings')}
@@ -227,7 +233,7 @@ export default function HomeScreen() {
                 color: theme.colors.text,
               }}
             >
-              Your Cats
+              My Cats
             </Text>
             <Pressable
               onPress={() => router.push('/(tabs)/cats')}

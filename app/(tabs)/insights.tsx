@@ -78,7 +78,7 @@ export default function InsightsScreen() {
               color: theme.colors.text,
             }}
           >
-            Insights {'\u{1F4CA}'}
+            Insights
           </Text>
         </Animated.View>
 

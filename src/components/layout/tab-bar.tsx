@@ -1,21 +1,21 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, Pressable } from 'react-native';
-import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withTiming,
-  withRepeat,
-  withSequence,
-  Easing,
-} from 'react-native-reanimated';
-import { Image } from 'expo-image';
-import * as Haptics from 'expo-haptics';
-import { router } from 'expo-router';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useLiveSessionStore } from '@/src/stores/live-session-store';
 import { theme } from '@/src/theme';
 import type { BottomTabBarProps } from '@react-navigation/bottom-tabs';
+import * as Haptics from 'expo-haptics';
 import type { ImageSource } from 'expo-image';
+import { Image } from 'expo-image';
+import { router } from 'expo-router';
+import React, { useEffect, useState } from 'react';
+import { Pressable, Text, View } from 'react-native';
+import Animated, {
+  Easing,
+  useAnimatedStyle,
+  useSharedValue,
+  withRepeat,
+  withSequence,
+  withTiming,
+} from 'react-native-reanimated';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const TAB_ICONS: Record<string, ImageSource> = {
   index: require('@/assets/icons/castle.png'),
@@ -25,7 +25,7 @@ const TAB_ICONS: Record<string, ImageSource> = {
 
 const TAB_LABELS: Record<string, string> = {
   index: 'Home',
-  cats: 'Cats',
+  cats: 'My Cats',
   insights: 'Insights',
 };
 
@@ -108,7 +108,7 @@ function TabItem({
           style={{
             width: 44,
             height: 44,
-            opacity: isFocused ? 1 : 0.7,
+            opacity: isFocused ? 1 : 0.9,
           }}
           contentFit="contain"
         />

@@ -185,7 +185,7 @@ export default function CatsScreen() {
               color: theme.colors.text,
             }}
           >
-            Your Cats {'\u{1F431}'}
+            My Cats
           </Text>
           <Button
             title="Add"

@@ -31,6 +31,7 @@ import { SuccessOverlay } from '@/src/components/ui/success-overlay';
 import { EmptyState } from '@/src/components/ui/empty-state';
 import { ACTIVITY_TYPES } from '@/src/utils/activity-types';
 import { theme } from '@/src/theme';
+import { playMeow } from '@/src/utils/play-meow';
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
@@ -394,6 +395,7 @@ export default function LiveSessionScreen() {
     if (process.env.EXPO_OS === 'ios') {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     }
+    playMeow();
     const cat = cats.find((c) => c.id === selectedCatId);
     liveStore.startRecording(selectedCatId, cat?.emoji ?? '');
     setDisplayMs(0);

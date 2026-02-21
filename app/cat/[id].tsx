@@ -3,6 +3,7 @@ import React, { useMemo, useState } from 'react';
 import { Modal, Pressable, ScrollView, Text, View } from 'react-native';
 import Animated, { FadeInDown, FadeInRight } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Ionicons } from '@expo/vector-icons';
 
 import { useCats } from '@/src/hooks/use-cats';
 import { useSessionsByCat } from '@/src/hooks/use-sessions';
@@ -299,21 +300,24 @@ export default function CatProfileScreen() {
         showsVerticalScrollIndicator={false}
       >
         {/* Back button */}
-        <Pressable
-          onPress={() => router.back()}
-          style={{ paddingHorizontal: theme.spacing.md, paddingVertical: 8 }}
-          hitSlop={12}
-        >
-          <Text
+        <View style={{ paddingHorizontal: theme.spacing.md, paddingVertical: 8 }}>
+          <Pressable
+            onPress={() => router.back()}
+            accessibilityRole="button"
+            accessibilityLabel="Go back"
+            hitSlop={12}
             style={{
-              fontFamily: theme.font.bodyMedium,
-              fontSize: 16,
-              color: theme.colors.primary,
+              width: 36,
+              height: 36,
+              borderRadius: 18,
+              backgroundColor: theme.colors.surface,
+              alignItems: 'center',
+              justifyContent: 'center',
             }}
           >
-            {'\u2190'} Back
-          </Text>
-        </Pressable>
+            <Ionicons name="chevron-back" size={22} color={theme.colors.text} />
+          </Pressable>
+        </View>
 
         {/* Hero header */}
         <Animated.View entering={FadeInDown.duration(500)} style={{ paddingHorizontal: theme.spacing.md }}>

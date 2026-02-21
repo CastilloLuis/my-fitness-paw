@@ -18,6 +18,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { Button } from '@/src/components/ui/button';
 import { theme } from '@/src/theme';
+import { playMeow } from '@/src/utils/play-meow';
 
 const STORAGE_KEY = '@myfitnesspaw:onboarding_done';
 
@@ -263,6 +264,7 @@ export default function OnboardingScreen() {
         animated: true,
       });
     } else {
+      playMeow();
       completeOnboarding();
     }
   }, [activeIndex, completeOnboarding]);

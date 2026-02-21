@@ -169,6 +169,9 @@ export default function SettingsScreen() {
           try {
             await signOut();
             queryClient.clear();
+            while (router.canGoBack()) {
+              router.back();
+            }
             router.replace('/(auth)/login');
           } catch {
             setLoggingOut(false);
