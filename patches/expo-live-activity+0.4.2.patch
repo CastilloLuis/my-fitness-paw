@@ -1,0 +1,161 @@
+diff --git a/node_modules/expo-live-activity/ios-files/LiveActivityWidget.swift b/node_modules/expo-live-activity/ios-files/LiveActivityWidget.swift
+index 24cd8c5..6f9d62e 100644
+--- a/node_modules/expo-live-activity/ios-files/LiveActivityWidget.swift
++++ b/node_modules/expo-live-activity/ios-files/LiveActivityWidget.swift
+@@ -56,27 +56,35 @@ struct LiveActivityWidget: Widget {
+         .applyWidgetURL(from: context.attributes.deepLinkUrl)
+     } dynamicIsland: { context in
+       DynamicIsland {
+-        DynamicIslandExpandedRegion(.leading, priority: 1) {
+-          dynamicIslandExpandedLeading(title: context.state.title, subtitle: context.state.subtitle)
+-            .dynamicIsland(verticalPlacement: .belowIfTooWide)
+-            .padding(.leading, 5)
+-            .applyWidgetURL(from: context.attributes.deepLinkUrl)
+-        }
+-        DynamicIslandExpandedRegion(.trailing) {
+-          if let imageName = context.state.imageName {
+-            dynamicIslandExpandedTrailing(imageName: imageName)
+-              .padding(.trailing, 5)
++        DynamicIslandExpandedRegion(.leading) {
++          if let imageName = context.state.dynamicIslandImageName ?? context.state.imageName {
++            resizableImage(imageName: imageName)
++              .frame(maxWidth: 28, maxHeight: 28)
++              .padding(.leading, 4)
+               .applyWidgetURL(from: context.attributes.deepLinkUrl)
+           }
+         }
+-        DynamicIslandExpandedRegion(.bottom) {
+-          if let date = context.state.timerEndDateInMilliseconds {
+-            dynamicIslandExpandedBottom(
+-              endDate: date, progressViewTint: context.attributes.progressViewTint
+-            )
+-            .padding(.horizontal, 5)
+-            .applyWidgetURL(from: context.attributes.deepLinkUrl)
++        DynamicIslandExpandedRegion(.center) {
++          HStack(spacing: 4) {
++            Text(context.state.title)
++              .font(.subheadline)
++              .fontWeight(.medium)
++              .foregroundStyle(.white)
++            if let date = context.state.timerEndDateInMilliseconds {
++              Text(Date(timeIntervalSince1970: date / 1000), style: .timer)
++                .font(.subheadline)
++                .fontWeight(.semibold)
++                .foregroundStyle(.white)
++                .monospacedDigit()
++            } else if let subtitle = context.state.subtitle {
++              Text(subtitle)
++                .font(.subheadline)
++                .fontWeight(.semibold)
++                .foregroundStyle(.white.opacity(0.75))
++                .monospacedDigit()
++            }
+           }
++          .applyWidgetURL(from: context.attributes.deepLinkUrl)
+         }
+       } compactLeading: {
+         if let dynamicIslandImageName = context.state.dynamicIslandImageName {
+@@ -86,84 +94,29 @@ struct LiveActivityWidget: Widget {
+         }
+       } compactTrailing: {
+         if let date = context.state.timerEndDateInMilliseconds {
+-          compactTimer(
+-            endDate: date,
+-            timerType: context.attributes.timerType ?? .circular,
+-            progressViewTint: context.attributes.progressViewTint
+-          ).applyWidgetURL(from: context.attributes.deepLinkUrl)
++          Text(Date(timeIntervalSince1970: date / 1000), style: .timer)
++            .font(.system(size: 15))
++            .fontWeight(.semibold)
++            .monospacedDigit()
++            .frame(maxWidth: 60)
++            .multilineTextAlignment(.trailing)
++            .applyWidgetURL(from: context.attributes.deepLinkUrl)
++        } else if let subtitle = context.state.subtitle {
++          Text(subtitle)
++            .font(.system(size: 15))
++            .fontWeight(.semibold)
++            .monospacedDigit()
++            .frame(maxWidth: 60)
++            .multilineTextAlignment(.trailing)
++            .applyWidgetURL(from: context.attributes.deepLinkUrl)
+         }
+       } minimal: {
+-        if let date = context.state.timerEndDateInMilliseconds {
+-          compactTimer(
+-            endDate: date,
+-            timerType: context.attributes.timerType ?? .circular,
+-            progressViewTint: context.attributes.progressViewTint
+-          ).applyWidgetURL(from: context.attributes.deepLinkUrl)
++        if let dynamicIslandImageName = context.state.dynamicIslandImageName {
++          resizableImage(imageName: dynamicIslandImageName)
++            .frame(maxWidth: 23, maxHeight: 23)
++            .applyWidgetURL(from: context.attributes.deepLinkUrl)
+         }
+       }
+     }
+   }
+-
+-  @ViewBuilder
+-  private func compactTimer(
+-    endDate: Double,
+-    timerType: LiveActivityAttributes.DynamicIslandTimerType,
+-    progressViewTint: String?
+-  ) -> some View {
+-    if timerType == .digital {
+-      Text(timerInterval: Date.toTimerInterval(miliseconds: endDate))
+-        .font(.system(size: 15))
+-        .minimumScaleFactor(0.8)
+-        .fontWeight(.semibold)
+-        .frame(maxWidth: 60)
+-        .multilineTextAlignment(.trailing)
+-    } else {
+-      circularTimer(endDate: endDate)
+-        .tint(progressViewTint.map { Color(hex: $0) })
+-    }
+-  }
+-
+-  private func dynamicIslandExpandedLeading(title: String, subtitle: String?) -> some View {
+-    VStack(alignment: .leading) {
+-      Spacer()
+-      Text(title)
+-        .font(.title2)
+-        .foregroundStyle(.white)
+-        .fontWeight(.semibold)
+-      if let subtitle {
+-        Text(subtitle)
+-          .font(.title3)
+-          .minimumScaleFactor(0.8)
+-          .foregroundStyle(.white.opacity(0.75))
+-      }
+-      Spacer()
+-    }
+-  }
+-
+-  private func dynamicIslandExpandedTrailing(imageName: String) -> some View {
+-    VStack {
+-      Spacer()
+-      resizableImage(imageName: imageName)
+-      Spacer()
+-    }
+-  }
+-
+-  private func dynamicIslandExpandedBottom(endDate: Double, progressViewTint: String?) -> some View {
+-    ProgressView(timerInterval: Date.toTimerInterval(miliseconds: endDate))
+-      .foregroundStyle(.white)
+-      .tint(progressViewTint.map { Color(hex: $0) })
+-      .padding(.top, 5)
+-  }
+-
+-  private func circularTimer(endDate: Double) -> some View {
+-    ProgressView(
+-      timerInterval: Date.toTimerInterval(miliseconds: endDate),
+-      countsDown: false,
+-      label: { EmptyView() },
+-      currentValueLabel: {
+-        EmptyView()
+-      }
+-    )
+-    .progressViewStyle(.circular)
+-  }
+ }

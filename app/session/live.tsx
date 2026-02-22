@@ -34,7 +34,6 @@ import { theme } from '@/src/theme';
 import { playMeow } from '@/src/utils/play-meow';
 import {
   startSessionActivity,
-  updateSessionTimer,
   pauseSessionActivity,
   resumeSessionActivity,
   stopSessionActivity,
@@ -363,18 +362,9 @@ export default function LiveSessionScreen() {
   useEffect(() => {
     if (phase !== 'recording') return;
 
-    let tickCount = 0;
-    const catName = selectedCat?.name ?? 'Cat';
-
     const tick = setInterval(() => {
       const elapsed = liveStore.getElapsedMs();
       setDisplayMs(elapsed);
-      tickCount++;
-
-      // Update Dynamic Island every 5 seconds while not paused
-      if (tickCount % 5 === 0 && !liveStore.isPaused) {
-        updateSessionTimer(catName, elapsed);
-      }
 
       // Auto-pause at safety limit
       if (
@@ -397,7 +387,7 @@ export default function LiveSessionScreen() {
     setDisplayMs(liveStore.getElapsedMs());
 
     return () => clearInterval(tick);
-  }, [phase, liveStore, playSafety, selectedCat]);
+  }, [phase, liveStore, playSafety]);
 
   // Reset auto-pause flag when starting a new session
   useEffect(() => {
@@ -430,8 +420,9 @@ export default function LiveSessionScreen() {
     if (liveStore.isPaused) {
       liveStore.resume();
       const catName = selectedCat?.name ?? 'Cat';
-      const elapsed = liveStore.getElapsedMs();
-      resumeSessionActivity(catName, elapsed);
+      const { startTime, pauseOffset } = useLiveSessionStore.getState();
+      const effectiveStart = (startTime ?? Date.now()) + pauseOffset;
+      resumeSessionActivity(catName, effectiveStart);
     } else {
       const elapsed = liveStore.getElapsedMs();
       liveStore.pause();

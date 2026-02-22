@@ -10,10 +10,7 @@ const CONFIG = {
   backgroundColor: '141311',
   titleColor: 'FBFAF7',
   subtitleColor: 'CBBBA4',
-  progressViewTint: 'F2B36D',
-  progressViewLabelColor: 'FBFAF7',
   deepLinkUrl: '/session/live',
-  timerType: 'digital' as const,
   imageSize: { width: 40 as const, height: 40 as const },
   imagePosition: 'left' as const,
   imageAlign: 'center' as const,
@@ -28,31 +25,19 @@ function formatElapsed(ms: number): string {
   return `${String(min).padStart(2, '0')}:${String(sec).padStart(2, '0')}`;
 }
 
-export function startSessionActivity(catName: string, _startTime: number) {
+export function startSessionActivity(catName: string, startTime: number) {
   if (process.env.EXPO_OS !== 'ios') return;
   try {
     const id = startActivity(
       {
-        title: catName,
-        subtitle: '00:00',
+        title: `${catName} is exercising`,
+        progressBar: { date: startTime },
         imageName: 'paw',
         dynamicIslandImageName: 'paw',
       },
       CONFIG
     );
     currentActivityId = id ?? null;
-  } catch {}
-}
-
-export function updateSessionTimer(catName: string, elapsedMs: number) {
-  if (process.env.EXPO_OS !== 'ios' || !currentActivityId) return;
-  try {
-    updateActivity(currentActivityId, {
-      title: catName,
-      subtitle: formatElapsed(elapsedMs),
-      imageName: 'paw',
-      dynamicIslandImageName: 'paw',
-    });
   } catch {}
 }
 
@@ -68,12 +53,15 @@ export function pauseSessionActivity(elapsedMs: number) {
   } catch {}
 }
 
-export function resumeSessionActivity(catName: string, elapsedMs: number) {
+export function resumeSessionActivity(
+  catName: string,
+  effectiveStartTime: number
+) {
   if (process.env.EXPO_OS !== 'ios' || !currentActivityId) return;
   try {
     updateActivity(currentActivityId, {
-      title: catName,
-      subtitle: formatElapsed(elapsedMs),
+      title: `${catName} is exercising`,
+      progressBar: { date: effectiveStartTime },
       imageName: 'paw',
       dynamicIslandImageName: 'paw',
     });
@@ -85,7 +73,6 @@ export function stopSessionActivity() {
   try {
     stopActivity(currentActivityId, {
       title: 'Session Complete',
-      subtitle: 'Great job!',
       progressBar: { progress: 1 },
       imageName: 'paw',
       dynamicIslandImageName: 'paw',
