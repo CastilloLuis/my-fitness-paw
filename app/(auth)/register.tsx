@@ -7,9 +7,9 @@ import {
   ScrollView,
 } from 'react-native';
 import { router } from 'expo-router';
-import { Image } from 'expo-image';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { openBrowserAsync } from 'expo-web-browser';
 
 import { signUp } from '@/src/supabase/auth';
 import { Input } from '@/src/components/ui/input';
@@ -27,6 +27,7 @@ export default function RegisterScreen() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [confirmationSent, setConfirmationSent] = useState(false);
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
 
   const clearError = () => setError('');
 
@@ -49,6 +50,10 @@ export default function RegisterScreen() {
     }
     if (password !== confirmPassword) {
       setError('Passwords do not match');
+      return;
+    }
+    if (!acceptedTerms) {
+      setError('Please accept the Terms and Privacy Policy');
       return;
     }
     setLoading(true);
@@ -105,7 +110,7 @@ export default function RegisterScreen() {
         </Text>
         <Button
           title="Back to Log In"
-          onPress={() => router.replace('/(auth)/login')}
+          onPress={() => router.replace('/(auth)/welcome')}
           variant="secondary"
           style={{ marginTop: 8 }}
         />
@@ -136,26 +141,38 @@ export default function RegisterScreen() {
       <ScrollView
         contentContainerStyle={{
           flexGrow: 1,
-          justifyContent: 'center',
           paddingHorizontal: theme.spacing.lg,
-          paddingTop: insets.top,
+          paddingTop: insets.top + 12,
           paddingBottom: insets.bottom + 20,
         }}
         keyboardShouldPersistTaps="handled"
       >
-        {/* Brand hero */}
-        <View style={{ alignItems: 'center', marginBottom: 32 }}>
-          <Image
-            source={require('@/assets/icons/paw.png')}
-            style={{ width: 100, height: 100 }}
-            contentFit="contain"
-          />
+        {/* Back button */}
+        <Pressable
+          onPress={() => router.back()}
+          accessibilityRole="button"
+          accessibilityLabel="Go back"
+          hitSlop={12}
+          style={{
+            width: 40,
+            height: 40,
+            borderRadius: 20,
+            backgroundColor: theme.colors.surface,
+            alignItems: 'center',
+            justifyContent: 'center',
+            marginBottom: 24,
+          }}
+        >
+          <Ionicons name="chevron-back" size={22} color={theme.colors.text} />
+        </Pressable>
+
+        {/* Header */}
+        <View style={{ marginBottom: 32 }}>
           <Text
             style={{
               fontFamily: theme.font.display,
-              fontSize: 26,
+              fontSize: 28,
               color: theme.colors.text,
-              marginTop: 14,
             }}
           >
             Join the Pack
@@ -165,7 +182,7 @@ export default function RegisterScreen() {
               fontFamily: theme.font.body,
               fontSize: 15,
               color: theme.colors.textMuted,
-              marginTop: 4,
+              marginTop: 6,
             }}
           >
             Create your account to get started
@@ -213,6 +230,72 @@ export default function RegisterScreen() {
             rightElement={eyeIcon(showConfirm, () => setShowConfirm(!showConfirm))}
           />
 
+          {/* Terms & Privacy */}
+          <Pressable
+            onPress={() => setAcceptedTerms(!acceptedTerms)}
+            accessibilityRole="checkbox"
+            accessibilityState={{ checked: acceptedTerms }}
+            style={{
+              flexDirection: 'row',
+              alignItems: 'flex-start',
+              gap: 10,
+              paddingVertical: 4,
+            }}
+          >
+            <View
+              style={{
+                width: 22,
+                height: 22,
+                borderRadius: 6,
+                borderWidth: 1.5,
+                borderColor: acceptedTerms
+                  ? theme.colors.primary
+                  : theme.colors.border,
+                backgroundColor: acceptedTerms
+                  ? theme.colors.primary
+                  : 'transparent',
+                alignItems: 'center',
+                justifyContent: 'center',
+                marginTop: 1,
+                borderCurve: 'continuous',
+              }}
+            >
+              {acceptedTerms && (
+                <Ionicons name="checkmark" size={15} color={theme.colors.white} />
+              )}
+            </View>
+            <Text
+              style={{
+                flex: 1,
+                fontFamily: theme.font.body,
+                fontSize: 13,
+                color: theme.colors.textMuted,
+                lineHeight: 19,
+              }}
+            >
+              I agree to the{' '}
+              <Text
+                onPress={() => openBrowserAsync('https://google.com')}
+                style={{
+                  fontFamily: theme.font.bodySemiBold,
+                  color: theme.colors.primary,
+                }}
+              >
+                Terms of Service
+              </Text>
+              {' '}and{' '}
+              <Text
+                onPress={() => openBrowserAsync('https://google.com')}
+                style={{
+                  fontFamily: theme.font.bodySemiBold,
+                  color: theme.colors.primary,
+                }}
+              >
+                Privacy Policy
+              </Text>
+            </Text>
+          </Pressable>
+
           {/* Error banner */}
           {!!error && (
             <View
@@ -249,7 +332,10 @@ export default function RegisterScreen() {
 
         {/* Secondary CTA */}
         <Pressable
-          onPress={() => router.back()}
+          onPress={() => {
+            router.back();
+            setTimeout(() => router.push('/(auth)/login'), 100);
+          }}
           accessibilityRole="button"
           accessibilityLabel="Go to login"
           style={{ marginTop: 24, alignItems: 'center', paddingVertical: 12 }}

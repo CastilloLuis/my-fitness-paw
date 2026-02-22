@@ -7,7 +7,6 @@ import {
   ScrollView,
 } from 'react-native';
 import { router } from 'expo-router';
-import { Image } from 'expo-image';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -53,39 +52,51 @@ export default function LoginScreen() {
       <ScrollView
         contentContainerStyle={{
           flexGrow: 1,
-          justifyContent: 'center',
           paddingHorizontal: theme.spacing.lg,
-          paddingTop: insets.top,
+          paddingTop: insets.top + 12,
           paddingBottom: insets.bottom + 20,
         }}
         keyboardShouldPersistTaps="handled"
       >
-        {/* Brand hero */}
-        <View style={{ alignItems: 'center', marginBottom: 40 }}>
-          <Image
-            source={require('@/assets/icons/paw.png')}
-            style={{ width: 120, height: 120 }}
-            contentFit="contain"
-          />
+        {/* Back button */}
+        <Pressable
+          onPress={() => router.back()}
+          accessibilityRole="button"
+          accessibilityLabel="Go back"
+          hitSlop={12}
+          style={{
+            width: 40,
+            height: 40,
+            borderRadius: 20,
+            backgroundColor: theme.colors.surface,
+            alignItems: 'center',
+            justifyContent: 'center',
+            marginBottom: 24,
+          }}
+        >
+          <Ionicons name="chevron-back" size={22} color={theme.colors.text} />
+        </Pressable>
+
+        {/* Header */}
+        <View style={{ marginBottom: 32 }}>
           <Text
             style={{
               fontFamily: theme.font.display,
-              fontSize: 30,
+              fontSize: 28,
               color: theme.colors.text,
-              marginTop: 16,
             }}
           >
-            MyFitnessPaw
+            Welcome back
           </Text>
           <Text
             style={{
               fontFamily: theme.font.body,
               fontSize: 15,
               color: theme.colors.textMuted,
-              marginTop: 4,
+              marginTop: 6,
             }}
           >
-            Track your cat's fitness journey
+            Log in to continue tracking
           </Text>
         </View>
 
@@ -162,7 +173,10 @@ export default function LoginScreen() {
 
         {/* Secondary CTA */}
         <Pressable
-          onPress={() => router.push('/(auth)/register')}
+          onPress={() => {
+            router.back();
+            setTimeout(() => router.push('/(auth)/register'), 100);
+          }}
           accessibilityRole="button"
           accessibilityLabel="Create an account"
           style={{ marginTop: 24, alignItems: 'center', paddingVertical: 12 }}

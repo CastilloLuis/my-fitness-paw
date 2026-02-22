@@ -58,7 +58,7 @@ function AuthGate({ children }: { children: React.ReactNode }) {
     if (!ready) return;
 
     if (!isAuthenticated) {
-      router.replace('/(auth)/login');
+      router.replace('/(auth)/welcome');
     } else if (!hasOnboarded) {
       router.replace('/onboarding');
     }
