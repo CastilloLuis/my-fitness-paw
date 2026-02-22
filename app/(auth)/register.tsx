@@ -244,8 +244,8 @@ export default function RegisterScreen() {
           >
             <View
               style={{
-                width: 22,
-                height: 22,
+                width: 18,
+                height: 18,
                 borderRadius: 6,
                 borderWidth: 1.5,
                 borderColor: acceptedTerms
@@ -256,12 +256,11 @@ export default function RegisterScreen() {
                   : 'transparent',
                 alignItems: 'center',
                 justifyContent: 'center',
-                marginTop: 1,
                 borderCurve: 'continuous',
               }}
             >
               {acceptedTerms && (
-                <Ionicons name="checkmark" size={15} color={theme.colors.white} />
+                <Ionicons name="checkmark" size={13} color={theme.colors.white} />
               )}
             </View>
             <Text
@@ -270,7 +269,7 @@ export default function RegisterScreen() {
                 fontFamily: theme.font.body,
                 fontSize: 13,
                 color: theme.colors.textMuted,
-                lineHeight: 19,
+                lineHeight: 20,
               }}
             >
               I agree to the{' '}
@@ -326,6 +325,7 @@ export default function RegisterScreen() {
             title="Create Account"
             onPress={handleRegister}
             loading={loading}
+            disabled={!displayName.trim() || !email.trim() || !password || !confirmPassword || !acceptedTerms}
             style={{ marginTop: 8 }}
           />
         </View>
