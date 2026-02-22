@@ -35,30 +35,35 @@ const ONBOARDING_KEY = '@myfitnesspaw:onboarding_done';
 
 function AuthGate({ children }: { children: React.ReactNode }) {
   const { loading, isAuthenticated } = useAuth();
-  const [onboardingChecked, setOnboardingChecked] = useState(false);
+  const [ready, setReady] = useState(false);
   const [hasOnboarded, setHasOnboarded] = useState(false);
 
   useEffect(() => {
-    if (!loading && isAuthenticated) {
-      AsyncStorage.getItem(ONBOARDING_KEY).then((value) => {
-        setHasOnboarded(value === 'true');
-        setOnboardingChecked(true);
-      });
-    } else if (!loading) {
-      setOnboardingChecked(true);
+    if (loading) return;
+
+    if (!isAuthenticated) {
+      setReady(true);
+      return;
     }
+
+    // Reset until async check completes so we don't flash onboarding
+    setReady(false);
+    AsyncStorage.getItem(ONBOARDING_KEY).then((value) => {
+      setHasOnboarded(value === 'true');
+      setReady(true);
+    });
   }, [loading, isAuthenticated]);
 
   useEffect(() => {
-    if (!loading && onboardingChecked) {
-      if (!isAuthenticated) {
-        router.replace('/(auth)/login');
-      } else if (!hasOnboarded) {
-        router.replace('/onboarding');
-      }
-      SplashScreen.hideAsync();
+    if (!ready) return;
+
+    if (!isAuthenticated) {
+      router.replace('/(auth)/login');
+    } else if (!hasOnboarded) {
+      router.replace('/onboarding');
     }
-  }, [loading, isAuthenticated, onboardingChecked, hasOnboarded]);
+    SplashScreen.hideAsync();
+  }, [ready, isAuthenticated, hasOnboarded]);
 
   return <>{children}</>;
 }
@@ -91,7 +96,7 @@ export default function RootLayout() {
             }}
           >
             <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-            <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+            <Stack.Screen name="(auth)" options={{ headerShown: false, gestureEnabled: false }} />
             <Stack.Screen
               name="onboarding"
               options={{

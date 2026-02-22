@@ -4321,6 +4321,11 @@ expo-linking@~8.0.11:
     expo-constants "~18.0.12"
     invariant "^2.2.4"
 
+expo-live-activity@^0.4.2:
+  version "0.4.2"
+  resolved "https://registry.yarnpkg.com/expo-live-activity/-/expo-live-activity-0.4.2.tgz#04a83a28e8b933f97172d7b31be55f4aefa5a225"
+  integrity sha512-b3QdsXAg8dPr6p8w4U4eBYdndArSprCPOJC9U8wovAsOOrCA3eSv4vwfn41XNDmaPTc6gweCABaIIxPaTg2oZQ==
+
 expo-modules-autolinking@3.0.24:
   version "3.0.24"
   resolved "https://registry.yarnpkg.com/expo-modules-autolinking/-/expo-modules-autolinking-3.0.24.tgz#55fdfe1ef5a053d5cc287582170a5f6d69ab0e30"

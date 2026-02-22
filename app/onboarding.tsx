@@ -1,5 +1,13 @@
 import React, { useCallback, useRef, useState } from 'react';
-import { View, Text, Pressable, useWindowDimensions } from 'react-native';
+import {
+  View,
+  Text,
+  Pressable,
+  useWindowDimensions,
+  KeyboardAvoidingView,
+  ScrollView,
+  Alert,
+} from 'react-native';
 import { router } from 'expo-router';
 import { Image } from 'expo-image';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -13,15 +21,20 @@ import Animated, {
   Extrapolation,
   FadeIn,
   FadeInUp,
+  FadeInDown,
 } from 'react-native-reanimated';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+import { Input } from '@/src/components/ui/input';
 import { Button } from '@/src/components/ui/button';
+import { useCreateCat } from '@/src/hooks/use-cats';
 import { theme } from '@/src/theme';
 import { playMeow } from '@/src/utils/play-meow';
 import { requestNotificationPermission } from '@/src/utils/notifications';
 
 const STORAGE_KEY = '@myfitnesspaw:onboarding_done';
+
+type Phase = 'intro' | 'create-cat' | 'finale';
 
 const steps = [
   {
@@ -240,12 +253,263 @@ function Dot({
   );
 }
 
+/** Phase: Create your first cat */
+function CreateCatStep({
+  onCreated,
+  onSkip,
+}: {
+  onCreated: (name: string) => void;
+  onSkip: () => void;
+}) {
+  const insets = useSafeAreaInsets();
+  const createCat = useCreateCat();
+
+  const [name, setName] = useState('');
+  const [weight, setWeight] = useState('');
+  const [age, setAge] = useState('');
+  const [nameError, setNameError] = useState('');
+
+  const handleAdd = async () => {
+    const trimmedName = name.trim();
+    if (!trimmedName) {
+      setNameError('Give your cat a name');
+      return;
+    }
+    setNameError('');
+
+    try {
+      await createCat.mutateAsync({
+        name: trimmedName,
+        weight_kg: weight ? parseFloat(weight) || null : null,
+        age_years: age ? parseInt(age, 10) || null : null,
+        emoji: '\u{1F431}',
+      });
+      playMeow();
+      onCreated(trimmedName);
+    } catch {
+      Alert.alert('Oops', 'Something went wrong. Please try again.');
+    }
+  };
+
+  return (
+    <KeyboardAvoidingView
+      style={{ flex: 1, backgroundColor: theme.colors.bg }}
+      behavior={process.env.EXPO_OS === 'ios' ? 'padding' : undefined}
+    >
+      {/* Skip button */}
+      <Animated.View
+        entering={FadeIn.delay(300).duration(400)}
+        style={{
+          position: 'absolute',
+          top: insets.top + 12,
+          right: theme.spacing.lg,
+          zIndex: 10,
+        }}
+      >
+        <Pressable
+          onPress={onSkip}
+          hitSlop={12}
+          accessibilityRole="button"
+          accessibilityLabel="Skip adding a cat"
+          style={({ pressed }) => ({ opacity: pressed ? 0.5 : 1 })}
+        >
+          <Text
+            style={{
+              fontFamily: theme.font.bodySemiBold,
+              fontSize: 15,
+              color: theme.colors.textMuted,
+            }}
+          >
+            Skip
+          </Text>
+        </Pressable>
+      </Animated.View>
+
+      <ScrollView
+        contentContainerStyle={{
+          flexGrow: 1,
+          justifyContent: 'center',
+          paddingHorizontal: theme.spacing.lg,
+          paddingTop: insets.top + 60,
+          paddingBottom: insets.bottom + 20,
+        }}
+        keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
+      >
+        {/* Header */}
+        <Animated.View
+          entering={FadeInDown.delay(0).duration(500)}
+          style={{ alignItems: 'center', marginBottom: 32 }}
+        >
+          <Image
+            source={require('@/assets/icons/cat-face.png')}
+            style={{ width: 120, height: 120 }}
+            contentFit="contain"
+          />
+          <Text
+            style={{
+              fontFamily: theme.font.display,
+              fontSize: 28,
+              color: theme.colors.text,
+              textAlign: 'center',
+              marginTop: 16,
+              lineHeight: 36,
+            }}
+          >
+            Add Your{'\n'}First Cat
+          </Text>
+          <Text
+            style={{
+              fontFamily: theme.font.body,
+              fontSize: 15,
+              color: theme.colors.textMuted,
+              textAlign: 'center',
+              marginTop: 8,
+              lineHeight: 22,
+            }}
+          >
+            Start tracking right away! You can always{'\n'}add more cats later.
+          </Text>
+        </Animated.View>
+
+        {/* Form */}
+        <Animated.View
+          entering={FadeInDown.delay(150).duration(500)}
+          style={{ gap: 14 }}
+        >
+          <Input
+            label="Cat's Name"
+            value={name}
+            onChangeText={(t) => { setName(t); setNameError(''); }}
+            autoCapitalize="words"
+            autoFocus
+            returnKeyType="next"
+            error={nameError}
+          />
+          <View style={{ flexDirection: 'row', gap: 12 }}>
+            <Input
+              label="Weight (kg)"
+              value={weight}
+              onChangeText={setWeight}
+              keyboardType="decimal-pad"
+              returnKeyType="next"
+              containerStyle={{ flex: 1 }}
+            />
+            <Input
+              label="Age (years)"
+              value={age}
+              onChangeText={setAge}
+              keyboardType="number-pad"
+              returnKeyType="done"
+              containerStyle={{ flex: 1 }}
+            />
+          </View>
+        </Animated.View>
+
+        {/* CTA */}
+        <Animated.View
+          entering={FadeInUp.delay(300).duration(500)}
+          style={{ marginTop: 28, gap: 16, alignItems: 'center' }}
+        >
+          <Button
+            title="Add Cat"
+            onPress={handleAdd}
+            loading={createCat.isPending}
+            style={{ width: '100%' }}
+          />
+        </Animated.View>
+      </ScrollView>
+    </KeyboardAvoidingView>
+  );
+}
+
+/** Phase: Finale */
+function FinaleStep({
+  catName,
+  onFinish,
+}: {
+  catName: string | null;
+  onFinish: () => void;
+}) {
+  const insets = useSafeAreaInsets();
+
+  return (
+    <View
+      style={{
+        flex: 1,
+        backgroundColor: theme.colors.bg,
+        justifyContent: 'center',
+        alignItems: 'center',
+        paddingHorizontal: theme.spacing.lg,
+        paddingTop: insets.top,
+        paddingBottom: insets.bottom + 20,
+      }}
+    >
+      <Animated.View
+        entering={FadeInDown.delay(0).duration(600)}
+        style={{ alignItems: 'center' }}
+      >
+        <Image
+          source={require('@/assets/icons/two-paws.png')}
+          style={{ width: 140, height: 140 }}
+          contentFit="contain"
+        />
+        <Text
+          style={{
+            fontFamily: theme.font.display,
+            fontSize: 32,
+            color: theme.colors.text,
+            textAlign: 'center',
+            marginTop: 20,
+            lineHeight: 40,
+          }}
+        >
+          You're All Set!
+        </Text>
+        <Text
+          style={{
+            fontFamily: theme.font.body,
+            fontSize: 16,
+            color: theme.colors.textMuted,
+            textAlign: 'center',
+            lineHeight: 24,
+            marginTop: 10,
+            paddingHorizontal: 20,
+          }}
+        >
+          {catName
+            ? `${catName}'s fitness journey starts now.\nLet's get playing!`
+            : 'Time to add your cats and start tracking\ntheir playtime!'}
+        </Text>
+      </Animated.View>
+
+      <Animated.View
+        entering={FadeInUp.delay(400).duration(500)}
+        style={{
+          position: 'absolute',
+          bottom: insets.bottom + 20,
+          left: theme.spacing.lg,
+          right: theme.spacing.lg,
+        }}
+      >
+        <Button
+          title="Get Started"
+          onPress={onFinish}
+          style={{ width: '100%' }}
+        />
+      </Animated.View>
+    </View>
+  );
+}
+
 export default function OnboardingScreen() {
   const { width } = useWindowDimensions();
   const insets = useSafeAreaInsets();
   const scrollX = useSharedValue(0);
   const flatListRef = useRef<Animated.FlatList<(typeof steps)[number]>>(null);
   const [activeIndex, setActiveIndex] = useState(0);
+  const [phase, setPhase] = useState<Phase>('intro');
+  const [createdCatName, setCreatedCatName] = useState<string | null>(null);
 
   const scrollHandler = useAnimatedScrollHandler({
     onScroll: (event) => {
@@ -266,10 +530,23 @@ export default function OnboardingScreen() {
         animated: true,
       });
     } else {
-      playMeow();
-      completeOnboarding();
+      setPhase('create-cat');
     }
-  }, [activeIndex, completeOnboarding]);
+  }, [activeIndex]);
+
+  const handleCatCreated = useCallback((name: string) => {
+    setCreatedCatName(name);
+    setPhase('finale');
+  }, []);
+
+  const handleSkipCat = useCallback(() => {
+    setPhase('finale');
+  }, []);
+
+  const handleFinish = useCallback(() => {
+    playMeow();
+    completeOnboarding();
+  }, [completeOnboarding]);
 
   const onViewableItemsChanged = useRef(
     ({ viewableItems }: { viewableItems: { index: number | null }[] }) => {
@@ -282,6 +559,14 @@ export default function OnboardingScreen() {
   const viewabilityConfig = useRef({
     viewAreaCoveragePercentThreshold: 50,
   }).current;
+
+  if (phase === 'create-cat') {
+    return <CreateCatStep onCreated={handleCatCreated} onSkip={handleSkipCat} />;
+  }
+
+  if (phase === 'finale') {
+    return <FinaleStep catName={createdCatName} onFinish={handleFinish} />;
+  }
 
   return (
     <View style={{ flex: 1, backgroundColor: theme.colors.bg }}>
@@ -296,10 +581,10 @@ export default function OnboardingScreen() {
         }}
       >
         <Pressable
-          onPress={completeOnboarding}
+          onPress={() => setPhase('create-cat')}
           hitSlop={12}
           accessibilityRole="button"
-          accessibilityLabel="Skip onboarding"
+          accessibilityLabel="Skip intro"
           style={({ pressed }) => ({ opacity: pressed ? 0.5 : 1 })}
         >
           <Text
@@ -358,7 +643,7 @@ export default function OnboardingScreen() {
 
         {/* Action button */}
         <Button
-          title={activeIndex === steps.length - 1 ? 'Get Started' : 'Next'}
+          title={activeIndex === steps.length - 1 ? 'Continue' : 'Next'}
           onPress={handleNext}
           style={{ width: '100%' }}
         />

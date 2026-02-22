@@ -32,6 +32,13 @@ import { EmptyState } from '@/src/components/ui/empty-state';
 import { ACTIVITY_TYPES } from '@/src/utils/activity-types';
 import { theme } from '@/src/theme';
 import { playMeow } from '@/src/utils/play-meow';
+import {
+  startSessionActivity,
+  updateSessionTimer,
+  pauseSessionActivity,
+  resumeSessionActivity,
+  stopSessionActivity,
+} from '@/src/utils/live-activity';
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
@@ -356,9 +363,18 @@ export default function LiveSessionScreen() {
   useEffect(() => {
     if (phase !== 'recording') return;
 
+    let tickCount = 0;
+    const catName = selectedCat?.name ?? 'Cat';
+
     const tick = setInterval(() => {
       const elapsed = liveStore.getElapsedMs();
       setDisplayMs(elapsed);
+      tickCount++;
+
+      // Update Dynamic Island every 5 seconds while not paused
+      if (tickCount % 5 === 0 && !liveStore.isPaused) {
+        updateSessionTimer(catName, elapsed);
+      }
 
       // Auto-pause at safety limit
       if (
@@ -370,6 +386,7 @@ export default function LiveSessionScreen() {
       ) {
         autoPausedRef.current = true;
         liveStore.pause();
+        pauseSessionActivity(elapsed);
         setTimeLimitReached(true);
         if (process.env.EXPO_OS === 'ios') {
           Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
@@ -380,7 +397,7 @@ export default function LiveSessionScreen() {
     setDisplayMs(liveStore.getElapsedMs());
 
     return () => clearInterval(tick);
-  }, [phase, liveStore, playSafety]);
+  }, [phase, liveStore, playSafety, selectedCat]);
 
   // Reset auto-pause flag when starting a new session
   useEffect(() => {
@@ -397,7 +414,9 @@ export default function LiveSessionScreen() {
     }
     playMeow();
     const cat = cats.find((c) => c.id === selectedCatId);
+    const catName = cat?.name ?? 'Cat';
     liveStore.startRecording(selectedCatId, cat?.emoji ?? '');
+    startSessionActivity(catName, Date.now());
     setDisplayMs(0);
     setTimeLimitReached(false);
     autoPausedRef.current = false;
@@ -410,16 +429,22 @@ export default function LiveSessionScreen() {
     }
     if (liveStore.isPaused) {
       liveStore.resume();
+      const catName = selectedCat?.name ?? 'Cat';
+      const elapsed = liveStore.getElapsedMs();
+      resumeSessionActivity(catName, elapsed);
     } else {
+      const elapsed = liveStore.getElapsedMs();
       liveStore.pause();
+      pauseSessionActivity(elapsed);
     }
-  }, [liveStore]);
+  }, [liveStore, selectedCat]);
 
   const handleStop = useCallback(() => {
     if (process.env.EXPO_OS === 'ios') {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     }
     const { elapsedMs } = liveStore.stopRecording();
+    stopSessionActivity();
     setFinalElapsedMs(elapsedMs);
     setSelectedActivity('free_roam');
     setTimeLimitReached(false);

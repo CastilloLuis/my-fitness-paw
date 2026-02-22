@@ -40,7 +40,8 @@
           }
         }
       ],
-      "expo-notifications"
+      "expo-notifications",
+      "expo-live-activity"
     ],
     "experiments": {
       "typedRoutes": true,

@@ -172,10 +172,6 @@ export default function SettingsScreen() {
           try {
             await signOut();
             queryClient.clear();
-            while (router.canGoBack()) {
-              router.back();
-            }
-            router.replace('/(auth)/login');
           } catch {
             setLoggingOut(false);
             Alert.alert('Error', 'Failed to log out. Please try again.');
@@ -209,7 +205,6 @@ export default function SettingsScreen() {
                       await deleteAccount();
                       await AsyncStorage.removeItem('@myfitnesspaw:onboarding_done');
                       queryClient.clear();
-                      router.replace('/(auth)/login');
                     } catch {
                       setDeleting(false);
                       Alert.alert('Error', 'Failed to delete account. Please try again.');

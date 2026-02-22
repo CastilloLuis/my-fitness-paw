@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { clearSessionActivity } from '@/src/utils/live-activity';
 
 interface LiveSessionState {
   /** Whether a session is currently being recorded */
@@ -72,7 +73,8 @@ export const useLiveSessionStore = create<LiveSessionState>((set, get) => ({
     return { elapsedMs: elapsed };
   },
 
-  clear: () =>
+  clear: () => {
+    clearSessionActivity();
     set({
       isRecording: false,
       catId: null,
@@ -81,7 +83,8 @@ export const useLiveSessionStore = create<LiveSessionState>((set, get) => ({
       pauseOffset: 0,
       isPaused: false,
       pauseStartedAt: null,
-    }),
+    });
+  },
 
   getElapsedMs: () => {
     const { startTime, pauseOffset, isPaused, pauseStartedAt } = get();
