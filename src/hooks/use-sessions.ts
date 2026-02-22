@@ -9,6 +9,7 @@ import {
   deleteSession,
 } from '@/src/supabase/queries/sessions';
 import { useAuth } from './use-auth';
+import { cancelAllReminders } from '@/src/utils/notifications';
 import type { SessionInsert } from '@/src/supabase/types';
 
 export function useSessions() {
@@ -56,6 +57,7 @@ export function useCreateSession() {
   return useMutation({
     mutationFn: (session: SessionInsert) => createSession(userId!, session),
     onSuccess: () => {
+      cancelAllReminders();
       queryClient.invalidateQueries({ queryKey: queryKeys.sessions.all });
       queryClient.invalidateQueries({ queryKey: queryKeys.sessions.today(userId!) });
       queryClient.invalidateQueries({ queryKey: queryKeys.sessions.weekly(userId!) });

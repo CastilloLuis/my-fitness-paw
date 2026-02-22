@@ -7,6 +7,7 @@ import {
   TextInput,
   Alert,
   ActivityIndicator,
+  Linking,
 } from 'react-native';
 import { router } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -20,6 +21,8 @@ import { useProfile } from '@/src/hooks/use-profile';
 import { updateProfile } from '@/src/supabase/queries/profiles';
 import { signOut, deleteAccount } from '@/src/supabase/auth';
 import { queryKeys } from '@/src/constants/query-keys';
+import { sendTestNotification } from '@/src/utils/notifications';
+import { useNotificationPermission } from '@/src/hooks/use-notification-permission';
 import { theme } from '@/src/theme';
 
 function SectionHeader({ title }: { title: string }) {
@@ -226,6 +229,7 @@ export default function SettingsScreen() {
     Alert.alert('Done', 'Onboarding reset. Restart the app to see it.');
   };
 
+  const { enabled: notificationsEnabled } = useNotificationPermission();
   const isDev = process.env.EXPO_PUBLIC_IS_DEV === 'true';
   const appVersion = Constants.expoConfig?.version ?? '1.0.0';
   const displayName = profile?.display_name || 'Set your name';
@@ -370,6 +374,24 @@ export default function SettingsScreen() {
           </View>
         </SettingsCard>
 
+        {/* Notifications section */}
+        <SectionHeader title="Notifications" />
+        <SettingsCard>
+          {notificationsEnabled === false ? (
+            <SettingsRow
+              icon="notifications-off-outline"
+              label="Enable Notifications"
+              onPress={() => Linking.openSettings()}
+            />
+          ) : (
+            <SettingsRow
+              icon="notifications-outline"
+              label="Notifications"
+              value="Enabled"
+            />
+          )}
+        </SettingsCard>
+
         {/* Account section */}
         <SectionHeader title="Account" />
         <SettingsCard>
@@ -420,6 +442,12 @@ export default function SettingsScreen() {
                 icon="refresh-outline"
                 label="Reset Onboarding"
                 onPress={handleResetOnboarding}
+              />
+              <Divider />
+              <SettingsRow
+                icon="notifications-outline"
+                label="Send Test Notification"
+                onPress={() => sendTestNotification()}
               />
             </SettingsCard>
           </>

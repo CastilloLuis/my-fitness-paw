@@ -1,8 +1,8 @@
 import { Image } from 'expo-image';
 import { router } from 'expo-router';
-import React, { useMemo } from 'react';
-import { Pressable, ScrollView, Text, View } from 'react-native';
-import Animated, { FadeInDown } from 'react-native-reanimated';
+import React, { useMemo, useState } from 'react';
+import { Linking, Pressable, ScrollView, Text, View } from 'react-native';
+import Animated, { FadeInDown, FadeOut } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Ionicons } from '@expo/vector-icons';
@@ -18,6 +18,9 @@ import { useCats } from '@/src/hooks/use-cats';
 import { useProfile } from '@/src/hooks/use-profile';
 import { useSessions, useTodaySessions } from '@/src/hooks/use-sessions';
 import { useStreak } from '@/src/hooks/use-streak';
+import { useNotificationScheduler } from '@/src/hooks/use-notification-scheduler';
+import { useNotificationPermission } from '@/src/hooks/use-notification-permission';
+import { requestNotificationPermission } from '@/src/utils/notifications';
 import { calculateDailyCalories } from '@/src/lib/cat-fitness';
 import { generateInsights } from '@/src/lib/insights/generate-insights';
 import { theme } from '@/src/theme';
@@ -75,6 +78,9 @@ export default function HomeScreen() {
     return map;
   }, [todaySessions, cats]);
 
+  useNotificationScheduler();
+  const { enabled: notificationsEnabled, recheck: recheckPermission } = useNotificationPermission();
+  const [bannerDismissed, setBannerDismissed] = useState(false);
   const streak = useStreak(todaySessions);
   const displayName = profile?.display_name || 'there';
   const isLoading = catsLoading || sessionsLoading;
@@ -146,6 +152,92 @@ export default function HomeScreen() {
             </Pressable>
           </View>
         </Animated.View>
+
+        {/* Notification banner */}
+        {notificationsEnabled === false && !bannerDismissed && (
+          <Animated.View
+            entering={FadeInDown.delay(50).duration(400)}
+            exiting={FadeOut.duration(300)}
+          >
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                backgroundColor: theme.colors.surfaceElevated,
+                borderRadius: theme.radius.md,
+                padding: 14,
+                gap: 12,
+                boxShadow: theme.shadow.sm.boxShadow,
+              }}
+            >
+              <Ionicons
+                name="notifications-off-outline"
+                size={22}
+                color={theme.colors.warning}
+              />
+              <View style={{ flex: 1 }}>
+                <Text
+                  style={{
+                    fontFamily: theme.font.bodySemiBold,
+                    fontSize: 14,
+                    color: theme.colors.text,
+                  }}
+                >
+                  Notifications are off
+                </Text>
+                <Text
+                  style={{
+                    fontFamily: theme.font.body,
+                    fontSize: 13,
+                    color: theme.colors.textMuted,
+                    marginTop: 2,
+                  }}
+                >
+                  Enable them to get daily play reminders for your cats.
+                </Text>
+              </View>
+              <View style={{ gap: 8, alignItems: 'center' }}>
+                <Pressable
+                  onPress={async () => {
+                    const granted = await requestNotificationPermission();
+                    if (granted) {
+                      recheckPermission();
+                    } else {
+                      Linking.openSettings();
+                    }
+                  }}
+                  accessibilityRole="button"
+                  accessibilityLabel="Enable notifications"
+                  hitSlop={8}
+                  style={{
+                    paddingHorizontal: 12,
+                    paddingVertical: 6,
+                    borderRadius: theme.radius.full,
+                    backgroundColor: theme.colors.primary,
+                  }}
+                >
+                  <Text
+                    style={{
+                      fontFamily: theme.font.bodySemiBold,
+                      fontSize: 12,
+                      color: theme.colors.onPrimary,
+                    }}
+                  >
+                    Enable
+                  </Text>
+                </Pressable>
+                <Pressable
+                  onPress={() => setBannerDismissed(true)}
+                  accessibilityRole="button"
+                  accessibilityLabel="Dismiss notification banner"
+                  hitSlop={8}
+                >
+                  <Ionicons name="close" size={18} color={theme.colors.textMuted} />
+                </Pressable>
+              </View>
+            </View>
+          </Animated.View>
+        )}
 
         {/* Today's summary */}
         <Animated.View entering={FadeInDown.delay(100).duration(500)}>
