@@ -832,6 +832,18 @@ export default function LiveSessionScreen() {
                 />
               ))}
             </View>
+            {selectedActivity && (
+              <Text
+                style={{
+                  fontFamily: theme.font.body,
+                  fontSize: 13,
+                  color: theme.colors.textMuted,
+                  fontStyle: 'italic',
+                }}
+              >
+                {t(ACTIVITY_TYPES.find((a) => a.id === selectedActivity)!.desc)}
+              </Text>
+            )}
 
             <Text
               style={{

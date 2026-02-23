@@ -266,6 +266,19 @@ export default function ManualLogScreen() {
                 );
               })}
             </View>
+            {selectedActivity && (
+              <Text
+                style={{
+                  fontFamily: theme.font.body,
+                  fontSize: 13,
+                  color: theme.colors.textMuted,
+                  marginTop: 6,
+                  fontStyle: 'italic',
+                }}
+              >
+                {t(ACTIVITY_TYPES.find((a) => a.id === selectedActivity)!.desc)}
+              </Text>
+            )}
           </View>
 
           {/* Duration */}

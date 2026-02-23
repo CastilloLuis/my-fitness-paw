@@ -229,7 +229,16 @@
     "hide": "Hide & Ambush",
     "climb": "Climbing",
     "catnip": "Catnip / Silver Vine",
-    "freeRoam": "Free Play"
+    "freeRoam": "Free Play",
+    "wandDesc": "Wave a feather teaser — stalking, pouncing, jumping",
+    "fetchDesc": "Toss a toy for your cat to chase and bring back",
+    "laserDesc": "Short bursts of chasing a laser dot (max 5 min)",
+    "puzzleDesc": "Food-dispensing toy that makes cats work for kibble",
+    "kickerDesc": "Stuffed toy your cat grabs and bunny-kicks",
+    "hideDesc": "Use boxes or bags for ambush and hiding games",
+    "climbDesc": "Encourage jumping on cat trees or shelves",
+    "catnipDesc": "Let your cat enjoy catnip or silver vine herbs",
+    "freeRoamDesc": "Unstructured solo play — batting, exploring, roaming"
   },
   "notifications": {
     "playtimeReminder": "Playtime Reminder",
