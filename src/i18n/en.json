@@ -85,7 +85,10 @@
     "startASession": "Start a session",
     "timeToPlay": "Time to play! Tap the paw to begin.",
     "notificationsOff": "Notifications are off",
-    "enableNotificationsMessage": "Enable them to get daily play reminders for your cats."
+    "enableNotificationsMessage": "Enable them to get daily play reminders for your cats.",
+    "sessions": "Sessions",
+    "calories": "Calories",
+    "catsPlayed": "Cats played"
   },
   "cats": {
     "myCats": "My Cats",

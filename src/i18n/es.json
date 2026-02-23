@@ -85,7 +85,10 @@
     "startASession": "Iniciar una sesi\u00f3n",
     "timeToPlay": "\u00a1Hora de jugar! Toca la patita para comenzar.",
     "notificationsOff": "Las notificaciones est\u00e1n desactivadas",
-    "enableNotificationsMessage": "Act\u00edvalas para recibir recordatorios diarios de juego para tus gatos."
+    "enableNotificationsMessage": "Act\u00edvalas para recibir recordatorios diarios de juego para tus gatos.",
+    "sessions": "Sesiones",
+    "calories": "Calor\u00edas",
+    "catsPlayed": "Gatos jugados"
   },
   "cats": {
     "myCats": "Mis Gatos",

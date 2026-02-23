@@ -56,11 +56,10 @@ export function useCreateSession() {
 
   return useMutation({
     mutationFn: (session: SessionInsert) => createSession(userId!, session),
-    onSuccess: () => {
+    onSuccess: async () => {
       cancelAllReminders();
-      queryClient.invalidateQueries({ queryKey: queryKeys.sessions.all });
-      queryClient.invalidateQueries({ queryKey: queryKeys.sessions.today(userId!) });
-      queryClient.invalidateQueries({ queryKey: queryKeys.sessions.weekly(userId!) });
+      // Refetch ALL session queries (matches any key starting with ['sessions'])
+      await queryClient.refetchQueries({ queryKey: ['sessions'] });
     },
   });
 }
@@ -71,10 +70,8 @@ export function useDeleteSession() {
 
   return useMutation({
     mutationFn: (sessionId: string) => deleteSession(sessionId),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.sessions.all });
-      queryClient.invalidateQueries({ queryKey: queryKeys.sessions.today(userId!) });
-      queryClient.invalidateQueries({ queryKey: queryKeys.sessions.weekly(userId!) });
+    onSuccess: async () => {
+      await queryClient.refetchQueries({ queryKey: ['sessions'] });
     },
   });
 }

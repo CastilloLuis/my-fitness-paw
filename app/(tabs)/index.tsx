@@ -1,36 +1,242 @@
+import * as Haptics from 'expo-haptics';
 import { Image } from 'expo-image';
+import { LinearGradient } from 'expo-linear-gradient';
 import { router, useFocusEffect } from 'expo-router';
-import React, { useCallback, useMemo, useState } from 'react';
-import { Linking, Pressable, ScrollView, Text, View } from 'react-native';
-import Animated, { FadeInDown, FadeOut } from 'react-native-reanimated';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Linking, Pressable, ScrollView, Text, View, type GestureResponderEvent } from 'react-native';
+import Animated, {
+  FadeInDown,
+  FadeOut,
+  useAnimatedStyle,
+  useSharedValue,
+  withSequence,
+  withSpring,
+  withTiming
+} from 'react-native-reanimated';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Ionicons } from '@expo/vector-icons';
 
-import { CatCard } from '@/src/components/cats/cat-card';
-import { StoryRow } from '@/src/components/stories/story-row';
 import { InsightCard } from '@/src/components/insights/insight-card';
 import { SessionCard } from '@/src/components/sessions/session-card';
-import { Button } from '@/src/components/ui/button';
-import { Card } from '@/src/components/ui/card';
+import { StoryRow } from '@/src/components/stories/story-row';
+import { Avatar } from '@/src/components/ui/avatar';
 import { ProgressRing } from '@/src/components/ui/progress-ring';
 import { Skeleton } from '@/src/components/ui/skeleton';
-import { useCats } from '@/src/hooks/use-cats';
-import { useProfile } from '@/src/hooks/use-profile';
-import { useSessions, useTodaySessions } from '@/src/hooks/use-sessions';
-import { useQueryClient } from '@tanstack/react-query';
 import { queryKeys } from '@/src/constants/query-keys';
 import { useAuth } from '@/src/hooks/use-auth';
-import { useStreak } from '@/src/hooks/use-streak';
-import { useNotificationScheduler } from '@/src/hooks/use-notification-scheduler';
+import { useCats } from '@/src/hooks/use-cats';
 import { useNotificationPermission } from '@/src/hooks/use-notification-permission';
-import { requestNotificationPermission } from '@/src/utils/notifications';
+import { useNotificationScheduler } from '@/src/hooks/use-notification-scheduler';
+import { useProfile } from '@/src/hooks/use-profile';
+import { useSessions, useTodaySessions } from '@/src/hooks/use-sessions';
+import { useStreak } from '@/src/hooks/use-streak';
 import { calculateDailyCalories } from '@/src/lib/cat-fitness';
 import { generateInsights } from '@/src/lib/insights/generate-insights';
 import { theme } from '@/src/theme';
+import { requestNotificationPermission } from '@/src/utils/notifications';
+import { useQueryClient } from '@tanstack/react-query';
 
 const DAILY_GOAL = 30;
+const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
+
+function CatActivityCard({
+  cat,
+  minutes,
+  calories,
+  sessions,
+  colors,
+  goal,
+  goalLabel,
+  sessionsLabel,
+}: {
+  cat: { id: string; name: string; emoji: string; image_base64: string | null };
+  minutes: number;
+  calories: number;
+  sessions: number;
+  colors: [string, string, string];
+  goal: number;
+  goalLabel: string;
+  sessionsLabel: string;
+}) {
+  const scale = useSharedValue(1);
+  const shimmerOpacity = useSharedValue(0);
+  const shimmerScale = useSharedValue(0.3);
+  const rippleX = useSharedValue(100);
+  const rippleY = useSharedValue(150);
+  const cardRef = useRef<View>(null);
+
+  const cardStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }],
+  }));
+
+  const shimmerStyle = useAnimatedStyle(() => ({
+    opacity: shimmerOpacity.value,
+    transform: [{ scale: shimmerScale.value }],
+    top: rippleY.value - 100,
+    left: rippleX.value - 100,
+  }));
+
+  const setRippleOrigin = (e: GestureResponderEvent) => {
+    cardRef.current?.measure((_x, _y, _w, _h, pageX, pageY) => {
+      rippleX.value = e.nativeEvent.pageX - pageX;
+      rippleY.value = e.nativeEvent.pageY - pageY;
+    });
+  };
+
+  const handlePressIn = (e: GestureResponderEvent) => {
+    setRippleOrigin(e);
+    scale.value = withSpring(0.96, { damping: 15, stiffness: 400 });
+    shimmerScale.value = 0.3;
+    shimmerOpacity.value = withTiming(0.35, { duration: 150 });
+    shimmerScale.value = withTiming(1.8, { duration: 500 });
+    if (process.env.EXPO_OS === 'ios') {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    }
+  };
+
+  const handlePressOut = () => {
+    scale.value = withSpring(1, { damping: 12, stiffness: 300 });
+    shimmerOpacity.value = withTiming(0, { duration: 400 });
+    shimmerScale.value = withTiming(0.3, { duration: 400 });
+  };
+
+  const handlePress = (e: GestureResponderEvent) => {
+    setRippleOrigin(e);
+    if (process.env.EXPO_OS === 'ios') {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    }
+    shimmerScale.value = 0.3;
+    shimmerOpacity.value = 0;
+    shimmerScale.value = withTiming(2.5, { duration: 400 });
+    shimmerOpacity.value = withSequence(
+      withTiming(0.5, { duration: 100 }),
+      withTiming(0, { duration: 350 })
+    );
+    router.push({ pathname: '/cat/[id]', params: { id: cat.id } });
+  };
+
+  return (
+    <AnimatedPressable
+      ref={cardRef}
+      onPressIn={handlePressIn}
+      onPressOut={handlePressOut}
+      onPress={handlePress}
+      style={[
+        {
+          width: 200,
+          borderRadius: theme.radius.xl,
+          borderCurve: 'continuous',
+          overflow: 'hidden',
+          boxShadow: '0 4px 16px rgba(0,0,0,0.12)',
+        },
+        cardStyle,
+      ]}
+    >
+      <LinearGradient
+        colors={colors}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={{ padding: 16, gap: 14 }}
+      >
+        {/* Shimmer ripple from touch point */}
+        <Animated.View
+          style={[
+            {
+              position: 'absolute',
+              width: 200,
+              height: 200,
+              borderRadius: 100,
+              backgroundColor: 'rgba(255,255,255,1)',
+            },
+            shimmerStyle,
+          ]}
+          pointerEvents="none"
+        />
+
+        {/* Cat identity */}
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+          <Avatar
+            emoji={cat.emoji}
+            imageBase64={cat.image_base64}
+            size={36}
+            backgroundColor="rgba(255,255,255,0.25)"
+          />
+          <Text
+            style={{
+              fontFamily: theme.font.bodySemiBold,
+              fontSize: 15,
+              color: '#FFFFFF',
+            }}
+            numberOfLines={1}
+          >
+            {cat.name}
+          </Text>
+        </View>
+
+        {/* Ring */}
+        <View style={{ alignItems: 'center' }}>
+          <ProgressRing
+            progress={minutes / goal}
+            size={90}
+            strokeWidth={7}
+            color="#FFFFFF"
+            bgColor="rgba(255,255,255,0.2)"
+            label={`${minutes}`}
+            sublabel={goalLabel}
+            labelColor="#FFFFFF"
+            sublabelColor="rgba(255,255,255,0.7)"
+          />
+        </View>
+
+        {/* Stats */}
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+          <View style={{ alignItems: 'center' }}>
+            <Text
+              style={{
+                fontFamily: theme.font.displayBold,
+                fontSize: 16,
+                color: '#FFFFFF',
+              }}
+            >
+              {calories > 0 ? calories : '--'}
+            </Text>
+            <Text
+              style={{
+                fontFamily: theme.font.body,
+                fontSize: 10,
+                color: 'rgba(255,255,255,0.65)',
+              }}
+            >
+              kcal
+            </Text>
+          </View>
+          <View style={{ alignItems: 'center' }}>
+            <Text
+              style={{
+                fontFamily: theme.font.displayBold,
+                fontSize: 16,
+                color: '#FFFFFF',
+              }}
+            >
+              {sessions}
+            </Text>
+            <Text
+              style={{
+                fontFamily: theme.font.body,
+                fontSize: 10,
+                color: 'rgba(255,255,255,0.65)',
+              }}
+            >
+              {sessionsLabel}
+            </Text>
+          </View>
+        </View>
+      </LinearGradient>
+    </AnimatedPressable>
+  );
+}
 
 function getGreeting(t: (key: string) => string): string {
   const hour = new Date().getHours();
@@ -84,6 +290,15 @@ export default function HomeScreen() {
     return map;
   }, [todaySessions, cats]);
 
+  const catSessionCounts = useMemo(() => {
+    if (!todaySessions) return {};
+    const map: Record<string, number> = {};
+    for (const s of todaySessions) {
+      map[s.cat_id] = (map[s.cat_id] ?? 0) + 1;
+    }
+    return map;
+  }, [todaySessions]);
+
   // Refetch session data when screen regains focus (e.g. after manual log)
   const queryClient = useQueryClient();
   const { userId } = useAuth();
@@ -91,13 +306,14 @@ export default function HomeScreen() {
     useCallback(() => {
       queryClient.invalidateQueries({ queryKey: queryKeys.sessions.today(userId!) });
       queryClient.invalidateQueries({ queryKey: queryKeys.sessions.all });
+      queryClient.invalidateQueries({ queryKey: queryKeys.cats.all });
     }, [queryClient, userId])
   );
 
   useNotificationScheduler();
   const { enabled: notificationsEnabled, recheck: recheckPermission } = useNotificationPermission();
   const [bannerDismissed, setBannerDismissed] = useState(false);
-  const streak = useStreak(todaySessions);
+  const streak = useStreak(allSessions);
   const displayName = profile?.display_name || 'there';
   const isLoading = catsLoading || sessionsLoading;
 
@@ -112,9 +328,6 @@ export default function HomeScreen() {
         }}
         showsVerticalScrollIndicator={false}
       >
-        {/* Stories */}
-        <StoryRow />
-
         {/* Greeting */}
         <Animated.View entering={FadeInDown.delay(0).duration(500)}>
           <View
@@ -141,16 +354,6 @@ export default function HomeScreen() {
                   contentFit="contain"
                 />
               </View>
-              {/* <Text
-                style={{
-                  fontFamily: theme.font.body,
-                  fontSize: 15,
-                  color: theme.colors.textMuted,
-                  marginTop: 4,
-                }}
-              >
-                {displayName}
-              </Text> */}
             </View>
             <Pressable
               onPress={() => router.push('/settings')}
@@ -171,6 +374,9 @@ export default function HomeScreen() {
             </Pressable>
           </View>
         </Animated.View>
+
+        {/* Stories */}
+        <StoryRow />
 
         {/* Notification banner */}
         {notificationsEnabled === false && !bannerDismissed && (
@@ -258,43 +464,90 @@ export default function HomeScreen() {
           </Animated.View>
         )}
 
-        {/* Today's summary */}
+        {/* Today's activity — per cat */}
         <Animated.View entering={FadeInDown.delay(100).duration(500)}>
-          <Card elevated>
-            <View style={{ alignItems: 'center', gap: 10 }}>
-              <Text
+          <View
+            style={{
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              marginBottom: 8,
+            }}
+          >
+            <Text
+              style={{
+                fontFamily: theme.font.bodySemiBold,
+                fontSize: 18,
+                color: theme.colors.text,
+              }}
+            >
+              {t('home.todaysActivity')}
+            </Text>
+            {streak > 0 && (
+              <View
                 style={{
-                  fontFamily: theme.font.bodyMedium,
-                  fontSize: 13,
-                  color: theme.colors.textMuted,
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  gap: 4,
+                  backgroundColor: theme.colors.ginger400 + '20',
+                  paddingHorizontal: 10,
+                  paddingVertical: 5,
+                  borderRadius: theme.radius.full,
                 }}
               >
-                {t('home.todaysActivity')}
-              </Text>
-              {isLoading ? (
-                <Skeleton width={110} height={110} borderRadius={55} />
-              ) : (
-                <ProgressRing
-                  progress={totalMinutesToday / DAILY_GOAL}
-                  size={110}
-                  strokeWidth={9}
-                  label={`${totalMinutesToday}`}
-                  sublabel={t('home.ofGoal', { goal: DAILY_GOAL })}
-                />
-              )}
-              {streak > 0 && (
+                <Text style={{ fontSize: 13 }}>{'\u{1F525}'}</Text>
                 <Text
                   style={{
                     fontFamily: theme.font.bodySemiBold,
-                    fontSize: 13,
+                    fontSize: 12,
                     color: theme.colors.ginger700,
                   }}
                 >
-                  {'\u{1F525}'} {t('home.dayStreak', { count: streak })}
+                  {t('home.dayStreak', { count: streak })}
                 </Text>
-              )}
+              </View>
+            )}
+          </View>
+
+          {isLoading ? (
+            <View style={{ flexDirection: 'row', gap: 12 }}>
+              <Skeleton width={200} height={160} borderRadius={theme.radius.xl} />
+              <Skeleton width={200} height={160} borderRadius={theme.radius.xl} />
             </View>
-          </Card>
+          ) : cats && cats.length > 0 ? (
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              style={{ marginHorizontal: -theme.spacing.md }}
+              contentContainerStyle={{
+                gap: 12,
+                paddingHorizontal: theme.spacing.md,
+                paddingVertical: 4,
+              }}
+            >
+              {cats.map((cat, i) => {
+                const gradients: [string, string, string][] = [
+                  ['#F8C47A', '#EE8A35', '#A94F18'],
+                  ['#7ABFA5', '#2F7D57', '#1B5E3B'],
+                  ['#A8B4C0', '#6F7A86', '#4A535E'],
+                  ['#D4A074', '#8A5A3C', '#5A3A2E'],
+                ];
+                return (
+                  <CatActivityCard
+                    key={cat.id}
+                    cat={cat}
+                    minutes={catSessionMinutes[cat.id] ?? 0}
+                    calories={catCalories[cat.id] ?? 0}
+                    sessions={catSessionCounts[cat.id] ?? 0}
+                    colors={gradients[i % gradients.length]}
+                    goal={DAILY_GOAL}
+                    goalLabel={t('home.ofGoal', { goal: DAILY_GOAL })}
+                    sessionsLabel={t('home.sessions')}
+                  />
+                );
+              })}
+            </ScrollView>
+          ) : null}
         </Animated.View>
 
         {/* Insight carousel */}
@@ -328,7 +581,7 @@ export default function HomeScreen() {
         )}
 
         {/* Cat cards */}
-        <Animated.View entering={FadeInDown.delay(200).duration(500)}>
+        {/* <Animated.View entering={FadeInDown.delay(200).duration(500)}>
           <View
             style={{
               flexDirection: 'row',
@@ -410,7 +663,7 @@ export default function HomeScreen() {
               />
             </Card>
           )}
-        </Animated.View>
+        </Animated.View> */}
 
         {/* Recent sessions */}
         <Animated.View entering={FadeInDown.delay(300).duration(500)}>

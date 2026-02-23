@@ -19,6 +19,8 @@ interface ProgressRingProps {
   bgColor?: string;
   label?: string;
   sublabel?: string;
+  labelColor?: string;
+  sublabelColor?: string;
 }
 
 export function ProgressRing({
@@ -29,6 +31,8 @@ export function ProgressRing({
   bgColor = theme.colors.taupe200,
   label,
   sublabel,
+  labelColor = theme.colors.text,
+  sublabelColor = theme.colors.textMuted,
 }: ProgressRingProps) {
   const radius = (size - strokeWidth) / 2;
   const circumference = 2 * Math.PI * radius;
@@ -80,7 +84,7 @@ export function ProgressRing({
             style={{
               fontFamily: theme.font.display,
               fontSize: 24,
-              color: theme.colors.text,
+              color: labelColor,
               fontVariant: ['tabular-nums'],
             }}
             selectable
@@ -93,7 +97,7 @@ export function ProgressRing({
             style={{
               fontFamily: theme.font.body,
               fontSize: 12,
-              color: theme.colors.textMuted,
+              color: sublabelColor,
               marginTop: 2,
             }}
           >
