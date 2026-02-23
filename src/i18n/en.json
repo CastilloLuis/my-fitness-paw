@@ -243,6 +243,13 @@
     "test4": "Meow! Someone needs attention \ud83d\ude3f",
     "playReminders": "Play Reminders"
   },
+  "stories": {
+    "title": "Stories",
+    "readMore": "Read more",
+    "swipeHint": "Swipe down to close",
+    "storyOf": "Story {{current}} of {{total}}",
+    "close": "Close story"
+  },
   "tabs": {
     "home": "Home",
     "myCats": "My Cats",

@@ -46,3 +46,15 @@ export interface SessionInsert {
   notes?: string | null;
   played_at?: string;
 }
+
+export interface Story {
+  id: string;
+  title: string;
+  image_url: string;
+  text_en: string;
+  text_es: string;
+  link: string;
+  sort_order: number;
+  is_active: boolean;
+  created_at: string;
+}

@@ -9,6 +9,7 @@ import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
 
 import { CatCard } from '@/src/components/cats/cat-card';
+import { StoryRow } from '@/src/components/stories/story-row';
 import { InsightCard } from '@/src/components/insights/insight-card';
 import { SessionCard } from '@/src/components/sessions/session-card';
 import { Button } from '@/src/components/ui/button';
@@ -98,6 +99,9 @@ export default function HomeScreen() {
         }}
         showsVerticalScrollIndicator={false}
       >
+        {/* Stories */}
+        <StoryRow />
+
         {/* Greeting */}
         <Animated.View entering={FadeInDown.delay(0).duration(500)}>
           <View

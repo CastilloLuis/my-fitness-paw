@@ -12,4 +12,7 @@ export const queryKeys = {
   profile: {
     me: ['profile', 'me'] as const,
   },
+  stories: {
+    active: ['stories', 'active'] as const,
+  },
 };

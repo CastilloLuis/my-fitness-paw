@@ -243,6 +243,13 @@
     "test4": "\u00a1Miau! Alguien necesita atenci\u00f3n \ud83d\ude3f",
     "playReminders": "Recordatorios de Juego"
   },
+  "stories": {
+    "title": "Historias",
+    "readMore": "Leer más",
+    "swipeHint": "Desliza hacia abajo para cerrar",
+    "storyOf": "Historia {{current}} de {{total}}",
+    "close": "Cerrar historia"
+  },
   "tabs": {
     "home": "Inicio",
     "myCats": "Mis Gatos",
