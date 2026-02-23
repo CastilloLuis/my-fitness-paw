@@ -2,6 +2,7 @@ import type { Cat, PlaySession } from '@/src/supabase/types';
 import { theme } from '@/src/theme';
 import { getActivityType } from '@/src/utils/activity-types';
 import { format } from 'date-fns';
+import { Image } from 'expo-image';
 import React from 'react';
 import { Pressable, Text, View } from 'react-native';
 import Animated, { FadeInLeft } from 'react-native-reanimated';
@@ -43,7 +44,11 @@ export function SessionCard({ session, cat, onDelete, index = 0 }: SessionCardPr
           justifyContent: 'center',
         }}
       >
-        <Text style={{ fontSize: 22 }}>{activity?.emoji ?? '\u{1F3AE}'}</Text>
+        <Image
+          source={activity?.icon ?? require('@/assets/icons/exercises/free-play.png')}
+          style={{ width: 28, height: 28 }}
+          contentFit="contain"
+        />
       </View>
 
       <View style={{ flex: 1 }}>

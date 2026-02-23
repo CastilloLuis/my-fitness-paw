@@ -4,6 +4,8 @@ import Animated, { FadeInDown } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 
+import { Image } from 'expo-image';
+
 import { StatRow } from '@/src/components/insights/stat-row';
 import { WeeklyBar } from '@/src/components/insights/weekly-bar';
 import { Avatar } from '@/src/components/ui/avatar';
@@ -143,11 +145,45 @@ export default function InsightsScreen() {
                   icon={'\u{1F4C9}'}
                 />
                 {stats.favoriteActivity && (
-                  <StatRow
-                    label={t('insights.favoriteActivity')}
-                    value={`${stats.favoriteActivity.emoji} ${t(stats.favoriteActivity.label)}`}
-                    icon={'\u{2B50}'}
-                  />
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      paddingVertical: 12,
+                      borderBottomWidth: 1,
+                      borderBottomColor: theme.colors.borderSubtle,
+                    }}
+                  >
+                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                      <Text style={{ fontSize: 18 }}>{'\u{2B50}'}</Text>
+                      <Text
+                        style={{
+                          fontFamily: theme.font.body,
+                          fontSize: 15,
+                          color: theme.colors.textSecondary,
+                        }}
+                      >
+                        {t('insights.favoriteActivity')}
+                      </Text>
+                    </View>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                      <Image
+                        source={stats.favoriteActivity.icon}
+                        style={{ width: 20, height: 20 }}
+                        contentFit="contain"
+                      />
+                      <Text
+                        style={{
+                          fontFamily: theme.font.bodySemiBold,
+                          fontSize: 16,
+                          color: theme.colors.text,
+                        }}
+                      >
+                        {t(stats.favoriteActivity.label)}
+                      </Text>
+                    </View>
+                  </View>
                 )}
               </Card>
             </Animated.View>

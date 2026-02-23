@@ -5,6 +5,8 @@ import Animated, {
   useAnimatedStyle,
   withTiming,
 } from 'react-native-reanimated';
+import type { ImageSource } from 'expo-image';
+import { Image } from 'expo-image';
 import * as Haptics from 'expo-haptics';
 import { useTranslation } from 'react-i18next';
 import { ACTIVITY_TYPES } from '@/src/utils/activity-types';
@@ -19,13 +21,15 @@ interface ActivityPickerProps {
 
 function ActivityChip({
   label,
-  emoji,
+  icon,
+  iconSize = 40,
   color,
   selected,
   onSelect,
 }: {
   label: string;
-  emoji: string;
+  icon: ImageSource;
+  iconSize?: number;
   color: string;
   selected: boolean;
   onSelect: () => void;
@@ -54,28 +58,29 @@ function ActivityChip({
       accessibilityState={{ selected }}
       style={[
         {
-          flexDirection: 'row',
           alignItems: 'center',
           gap: 6,
-          paddingVertical: 8,
-          paddingHorizontal: 12,
-          borderRadius: theme.radius.full,
+          paddingVertical: 10,
+          paddingHorizontal: 8,
+          borderRadius: theme.radius.lg,
           backgroundColor: selected ? color + '18' : theme.colors.surface,
           borderWidth: selected ? 1.5 : 1,
           borderColor: selected ? color : theme.colors.borderSubtle,
           borderCurve: 'continuous',
+          width: '31%',
         },
         animStyle,
       ]}
     >
-      <Text style={{ fontSize: 16 }}>{emoji}</Text>
+      <Image source={icon} style={{ width: iconSize, height: iconSize }} contentFit="contain" />
       <Text
         style={{
           fontFamily: selected ? theme.font.bodySemiBold : theme.font.body,
-          fontSize: 13,
+          fontSize: 12,
           color: selected ? color : theme.colors.text,
+          textAlign: 'center',
         }}
-        numberOfLines={1}
+        numberOfLines={2}
       >
         {label}
       </Text>
@@ -87,12 +92,13 @@ export function ActivityPicker({ selectedId, onSelect }: ActivityPickerProps) {
   const { t } = useTranslation();
 
   return (
-    <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
+    <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8, justifyContent: 'space-between' }}>
       {ACTIVITY_TYPES.map((activity) => (
         <ActivityChip
           key={activity.id}
           label={t(activity.label)}
-          emoji={activity.emoji}
+          icon={activity.icon}
+          iconSize={activity.iconSize}
           color={activity.color}
           selected={activity.id === selectedId}
           onSelect={() => onSelect(activity.id)}

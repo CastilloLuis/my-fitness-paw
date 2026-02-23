@@ -13,6 +13,8 @@ import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { useTranslation } from 'react-i18next';
 
+import { Image } from 'expo-image';
+
 import { useCats } from '@/src/hooks/use-cats';
 import { useCreateSession } from '@/src/hooks/use-sessions';
 import { ACTIVITY_TYPES } from '@/src/utils/activity-types';
@@ -218,7 +220,7 @@ export default function ManualLogScreen() {
             >
               {t('session.whatDidYouPlay')}
             </Text>
-            <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
+            <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8, justifyContent: 'space-between' }}>
               {ACTIVITY_TYPES.map((activity) => {
                 const selected = selectedActivity === activity.id;
                 return (
@@ -234,12 +236,11 @@ export default function ManualLogScreen() {
                     accessibilityLabel={t(activity.label)}
                     accessibilityState={{ selected }}
                     style={{
-                      flexDirection: 'row',
                       alignItems: 'center',
                       gap: 6,
                       paddingVertical: 10,
-                      paddingHorizontal: 14,
-                      borderRadius: theme.radius.full,
+                      paddingHorizontal: 8,
+                      borderRadius: theme.radius.lg,
                       backgroundColor: selected
                         ? activity.color + '20'
                         : theme.colors.surfaceElevated,
@@ -248,17 +249,20 @@ export default function ManualLogScreen() {
                         ? activity.color
                         : theme.colors.borderSubtle,
                       borderCurve: 'continuous',
+                      width: '31%',
                     }}
                   >
-                    <Text style={{ fontSize: 16 }}>{activity.emoji}</Text>
+                    <Image source={activity.icon} style={{ width: activity.iconSize ?? 40, height: activity.iconSize ?? 40 }} contentFit="contain" />
                     <Text
                       style={{
                         fontFamily: selected
                           ? theme.font.bodySemiBold
                           : theme.font.body,
-                        fontSize: 13,
+                        fontSize: 12,
                         color: selected ? activity.color : theme.colors.textMuted,
+                        textAlign: 'center',
                       }}
+                      numberOfLines={2}
                     >
                       {t(activity.label)}
                     </Text>
