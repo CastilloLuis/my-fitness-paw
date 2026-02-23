@@ -162,10 +162,10 @@ function AnimatedBackground() {
         scaleDur={9000}
         delay={800}
       />
-      {/* Cinnamon — bottom left */}
+      {/* Warm cinnamon — bottom left */}
       <Blob
         size={width * 0.55}
-        color={theme.colors.cinnamon600 + '10'}
+        color={theme.colors.ginger500 + '10'}
         top={height * 0.55}
         left={-width * 0.1}
         dxRange={30}
@@ -188,10 +188,10 @@ function AnimatedBackground() {
         scaleDur={6000}
         delay={400}
       />
-      {/* Taupe haze — bottom right */}
+      {/* Warm ginger haze — bottom right */}
       <Blob
         size={width * 0.5}
-        color={theme.colors.taupe200 + '20'}
+        color={theme.colors.ginger400 + '14'}
         top={height * 0.7}
         left={width * 0.4}
         dxRange={25}
@@ -335,6 +335,7 @@ export default function WelcomeScreen() {
       style={{
         flex: 1,
         backgroundColor: theme.colors.bg,
+        ...({ experimental_backgroundImage: 'linear-gradient(165deg, #FBFAF7 0%, #F3EFE7 25%, #F2B36D22 50%, #E98A2A18 75%, #FBFAF7 100%)' } as any),
       }}
     >
       <AnimatedBackground />
