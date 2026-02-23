@@ -58,3 +58,14 @@ export interface Story {
   is_active: boolean;
   created_at: string;
 }
+
+export interface LoginBanner {
+  text_en: string;
+  text_es: string;
+}
+
+export interface AppConfig {
+  loginEnabled: boolean;
+  signupEnabled: boolean;
+  loginBanner: LoginBanner | null;
+}

@@ -15,10 +15,12 @@ import { signIn } from '@/src/supabase/auth';
 import { Input } from '@/src/components/ui/input';
 import { Button } from '@/src/components/ui/button';
 import { theme } from '@/src/theme';
+import { useAppConfig } from '@/src/hooks/use-app-config';
 
 export default function LoginScreen() {
   const insets = useSafeAreaInsets();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const { data: appConfig } = useAppConfig();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -78,6 +80,38 @@ export default function LoginScreen() {
         >
           <Ionicons name="chevron-back" size={22} color={theme.colors.text} />
         </Pressable>
+
+        {/* Login banner */}
+        {appConfig?.loginBanner != null && (
+          <View
+            style={{
+              backgroundColor: theme.colors.info + '12',
+              borderRadius: theme.radius.md,
+              padding: 12,
+              borderWidth: 1,
+              borderColor: theme.colors.info + '25',
+              borderCurve: 'continuous',
+              flexDirection: 'row',
+              alignItems: 'center',
+              gap: 10,
+              marginBottom: 16,
+            }}
+          >
+            <Ionicons name="information-circle" size={20} color={theme.colors.info} />
+            <Text
+              style={{
+                flex: 1,
+                fontFamily: theme.font.bodyMedium,
+                fontSize: 14,
+                color: theme.colors.text,
+              }}
+            >
+              {i18n.language.startsWith('es')
+                ? appConfig.loginBanner.text_es
+                : appConfig.loginBanner.text_en}
+            </Text>
+          </View>
+        )}
 
         {/* Header */}
         <View style={{ marginBottom: 32 }}>

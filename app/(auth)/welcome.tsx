@@ -19,6 +19,7 @@ import { useTranslation } from 'react-i18next';
 
 import { Button } from '@/src/components/ui/button';
 import { theme } from '@/src/theme';
+import { useAppConfig } from '@/src/hooks/use-app-config';
 
 const CHARACTERS: ImageSource[] = [
   require('@/assets/character/jumping.png'),
@@ -323,6 +324,7 @@ export default function WelcomeScreen() {
   const insets = useSafeAreaInsets();
   const [activeIndex, setActiveIndex] = useState(0);
   const { t } = useTranslation();
+  const { data: appConfig } = useAppConfig();
 
   const handleCycle = React.useCallback(() => {
     setActiveIndex((prev) => (prev + 1) % CHARACTERS.length);
@@ -398,11 +400,13 @@ export default function WelcomeScreen() {
           <Button
             title={t('auth.logIn')}
             onPress={() => router.push('/(auth)/login')}
+            disabled={appConfig?.loginEnabled === false}
           />
           <Button
             title={t('auth.createAccount')}
             onPress={() => router.push('/(auth)/register')}
             variant="secondary"
+            disabled={appConfig?.signupEnabled === false}
           />
         </Animated.View>
       </View>

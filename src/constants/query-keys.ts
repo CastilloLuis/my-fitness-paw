@@ -15,4 +15,7 @@ export const queryKeys = {
   stories: {
     active: ['stories', 'active'] as const,
   },
+  appConfig: {
+    all: ['appConfig'] as const,
+  },
 };
