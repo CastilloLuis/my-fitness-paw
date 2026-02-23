@@ -47,10 +47,10 @@ function timeOfDayInsight(sessions: PlaySession[]): InsightCard | null {
   const pct = Math.round((topCount / sessions.length) * 100);
   if (pct < 40) return null;
 
-  const labels: Record<string, string> = {
-    morning: 'Morning',
-    afternoon: 'Afternoon',
-    evening: 'Evening',
+  const headlineKeys: Record<string, string> = {
+    morning: 'insightCards.morningPlayer',
+    afternoon: 'insightCards.afternoonPlayer',
+    evening: 'insightCards.eveningPlayer',
   };
   const emojis: Record<string, string> = {
     morning: '\u{1F305}',
@@ -61,8 +61,8 @@ function timeOfDayInsight(sessions: PlaySession[]): InsightCard | null {
   return {
     id: 'time-of-day',
     emoji: emojis[topPeriod],
-    headline: `${labels[topPeriod]} player`,
-    metric: `${pct}% of sessions are in the ${topPeriod}`,
+    headline: i18n.t(headlineKeys[topPeriod]),
+    metric: i18n.t('insightCards.sessionsInPeriod', { pct, period: i18n.t(`insightCards.${topPeriod}`) }),
   };
 }
 
@@ -91,8 +91,11 @@ function durationTrendInsight(sessions: PlaySession[]): InsightCard | null {
   return {
     id: 'duration-trend',
     emoji: trending ? '\u{1F4C8}' : '\u{1F4C9}',
-    headline: trending ? 'Sessions getting longer' : 'Sessions getting shorter',
-    metric: `${Math.abs(change)}% ${trending ? 'longer' : 'shorter'} recently (avg ${formatMinutes(Math.round(avgRecent))})`,
+    headline: i18n.t(trending ? 'insightCards.sessionsGettingLonger' : 'insightCards.sessionsGettingShorter'),
+    metric: i18n.t(trending ? 'insightCards.longerRecently' : 'insightCards.shorterRecently', {
+      change: Math.abs(change),
+      avg: formatMinutes(Math.round(avgRecent)),
+    }),
   };
 }
 
@@ -116,8 +119,8 @@ function activityPreferenceInsight(sessions: PlaySession[]): InsightCard | null 
   return {
     id: 'activity-preference',
     emoji: activity.emoji,
-    headline: `${i18n.t(activity.label)} fan`,
-    metric: `${pct}% of sessions (${topCount} total)`,
+    headline: i18n.t('insightCards.activityFan', { activity: i18n.t(activity.label) }),
+    metric: i18n.t('insightCards.activityPct', { pct, count: topCount }),
   };
 }
 
@@ -156,8 +159,8 @@ function streakInsight(sessions: PlaySession[]): InsightCard | null {
   return {
     id: 'streak',
     emoji: '\u{1F525}',
-    headline: `${streak}-day streak!`,
-    metric: `Keep it going — play today to extend`,
+    headline: i18n.t('insightCards.dayStreak', { count: streak }),
+    metric: i18n.t('insightCards.keepItGoing'),
   };
 }
 
@@ -186,16 +189,16 @@ function consistencyInsight(sessions: PlaySession[]): InsightCard | null {
   const score = Math.round((weeksWithActivity.size / 4) * 100);
   if (score < 50) return null;
 
-  let label: string;
-  if (score === 100) label = 'Perfect consistency';
-  else if (score >= 75) label = 'Strong consistency';
-  else label = 'Building momentum';
+  let labelKey: string;
+  if (score === 100) labelKey = 'insightCards.perfectConsistency';
+  else if (score >= 75) labelKey = 'insightCards.strongConsistency';
+  else labelKey = 'insightCards.buildingMomentum';
 
   return {
     id: 'consistency',
     emoji: '\u{1F3AF}',
-    headline: label,
-    metric: `Active ${weeksWithActivity.size} of last 4 weeks`,
+    headline: i18n.t(labelKey),
+    metric: i18n.t('insightCards.activeWeeks', { count: weeksWithActivity.size }),
   };
 }
 
@@ -228,9 +231,9 @@ function multiCatInsight(
   return {
     id: 'multi-cat',
     emoji: '\u{1F408}',
-    headline: `${lowCat.name} needs love`,
-    metric: `${formatMinutes(diff)} less playtime than ${topCat.name}`,
-    cta: { label: 'Play now', route: '/session/live' },
+    headline: i18n.t('insightCards.needsLove', { name: lowCat.name }),
+    metric: i18n.t('insightCards.lessPlaytime', { diff: formatMinutes(diff), name: topCat.name }),
+    cta: { label: i18n.t('insightCards.playNow'), route: '/session/live' },
   };
 }
 
@@ -251,8 +254,8 @@ function personalBestInsight(sessions: PlaySession[]): InsightCard | null {
   return {
     id: 'personal-best',
     emoji: '\u{1F3C6}',
-    headline: 'New personal best!',
-    metric: `${formatMinutes(longest.duration_minutes)} — your longest session`,
+    headline: i18n.t('insightCards.newPersonalBest'),
+    metric: i18n.t('insightCards.longestSession', { duration: formatMinutes(longest.duration_minutes) }),
   };
 }
 

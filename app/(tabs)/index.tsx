@@ -1,6 +1,6 @@
 import { Image } from 'expo-image';
-import { router } from 'expo-router';
-import React, { useMemo, useState } from 'react';
+import { router, useFocusEffect } from 'expo-router';
+import React, { useCallback, useMemo, useState } from 'react';
 import { Linking, Pressable, ScrollView, Text, View } from 'react-native';
 import Animated, { FadeInDown, FadeOut } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -19,6 +19,9 @@ import { Skeleton } from '@/src/components/ui/skeleton';
 import { useCats } from '@/src/hooks/use-cats';
 import { useProfile } from '@/src/hooks/use-profile';
 import { useSessions, useTodaySessions } from '@/src/hooks/use-sessions';
+import { useQueryClient } from '@tanstack/react-query';
+import { queryKeys } from '@/src/constants/query-keys';
+import { useAuth } from '@/src/hooks/use-auth';
 import { useStreak } from '@/src/hooks/use-streak';
 import { useNotificationScheduler } from '@/src/hooks/use-notification-scheduler';
 import { useNotificationPermission } from '@/src/hooks/use-notification-permission';
@@ -80,6 +83,16 @@ export default function HomeScreen() {
     }
     return map;
   }, [todaySessions, cats]);
+
+  // Refetch session data when screen regains focus (e.g. after manual log)
+  const queryClient = useQueryClient();
+  const { userId } = useAuth();
+  useFocusEffect(
+    useCallback(() => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.sessions.today(userId!) });
+      queryClient.invalidateQueries({ queryKey: queryKeys.sessions.all });
+    }, [queryClient, userId])
+  );
 
   useNotificationScheduler();
   const { enabled: notificationsEnabled, recheck: recheckPermission } = useNotificationPermission();

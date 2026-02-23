@@ -2,7 +2,8 @@ import { useEffect, useState } from 'react';
 import { Stack, router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { focusManager, QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { AppState, type AppStateStatus } from 'react-native';
 import {
   useFonts,
   PlusJakartaSans_400Regular,
@@ -21,6 +22,14 @@ import '@/src/i18n';
 import '@/src/global.css';
 
 SplashScreen.preventAutoHideAsync();
+
+// Refetch stale queries when app returns to foreground
+focusManager.setEventListener((handleFocus) => {
+  const subscription = AppState.addEventListener('change', (status: AppStateStatus) => {
+    handleFocus(status === 'active');
+  });
+  return () => subscription.remove();
+});
 
 const queryClient = new QueryClient({
   defaultOptions: {

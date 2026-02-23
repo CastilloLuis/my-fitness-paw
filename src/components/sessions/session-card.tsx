@@ -5,6 +5,7 @@ import { format } from 'date-fns';
 import React from 'react';
 import { Pressable, Text, View } from 'react-native';
 import Animated, { FadeInLeft } from 'react-native-reanimated';
+import { useTranslation } from 'react-i18next';
 
 interface SessionCardProps {
   session: PlaySession;
@@ -14,6 +15,7 @@ interface SessionCardProps {
 }
 
 export function SessionCard({ session, cat, onDelete, index = 0 }: SessionCardProps) {
+  const { t } = useTranslation();
   const activity = getActivityType(session.activity_type);
   const time = format(new Date(session.played_at), 'h:mm a');
 
@@ -52,7 +54,7 @@ export function SessionCard({ session, cat, onDelete, index = 0 }: SessionCardPr
             color: theme.colors.text,
           }}
         >
-          {activity?.label ?? session.activity_type}
+          {activity ? t(activity.label) : session.activity_type}
         </Text>
         <Text
           style={{
