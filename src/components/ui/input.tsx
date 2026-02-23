@@ -118,7 +118,7 @@ export function Input({
       >
         {label}
       </Animated.Text>
-      <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+      <View style={{ flexDirection: 'row', alignItems: 'center', minHeight: 24 }}>
         <TextInput
           ref={inputRef}
           value={value}
@@ -132,11 +132,24 @@ export function Input({
             fontSize: 16,
             color: theme.colors.text,
             padding: 0,
+            paddingRight: rightElement ? 32 : 0,
           }}
           {...props}
         />
-        {rightElement}
       </View>
+      {rightElement && (
+        <View
+          style={{
+            position: 'absolute',
+            right: 16,
+            top: 0,
+            bottom: 0,
+            justifyContent: 'center',
+          }}
+        >
+          {rightElement}
+        </View>
+      )}
       {error && (
         <Text
           style={{
