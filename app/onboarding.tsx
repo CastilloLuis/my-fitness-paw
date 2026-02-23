@@ -1,4 +1,4 @@
-import React, { useCallback, useRef, useState } from 'react';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
 import {
   View,
   Text,
@@ -24,6 +24,7 @@ import Animated, {
   FadeInDown,
 } from 'react-native-reanimated';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useTranslation } from 'react-i18next';
 
 import { Input } from '@/src/components/ui/input';
 import { Button } from '@/src/components/ui/button';
@@ -36,29 +37,12 @@ const STORAGE_KEY = '@myfitnesspaw:onboarding_done';
 
 type Phase = 'intro' | 'create-cat' | 'finale';
 
-const steps = [
-  {
-    id: '1',
-    icon: require('@/assets/icons/paw.png'),
-    title: 'Welcome to\nMyFitnessPaw',
-    message:
-      'Your cat\u2019s fitness journey starts here.\nTrack play, monitor health, and keep them happy.',
-  },
-  {
-    id: '2',
-    icon: require('@/assets/icons/cat-face.png'),
-    title: 'Track Every\nPlay Session',
-    message:
-      'Record live sessions or log them manually.\nSee daily progress and build streaks.',
-  },
-  {
-    id: '3',
-    icon: require('@/assets/icons/stats.png'),
-    title: 'Discover\nInsights',
-    message:
-      'Get calorie estimates, activity trends, and\npersonalized tips for each of your cats.',
-  },
-] as const;
+type Step = {
+  id: string;
+  icon: any;
+  title: string;
+  message: string;
+};
 
 /** Scroll-driven page with parallax */
 function OnboardingPage({
@@ -261,6 +245,7 @@ function CreateCatStep({
   onCreated: (name: string) => void;
   onSkip: () => void;
 }) {
+  const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   const createCat = useCreateCat();
 
@@ -272,7 +257,7 @@ function CreateCatStep({
   const handleAdd = async () => {
     const trimmedName = name.trim();
     if (!trimmedName) {
-      setNameError('Give your cat a name');
+      setNameError(t('onboarding.giveCatName'));
       return;
     }
     setNameError('');
@@ -287,7 +272,7 @@ function CreateCatStep({
       playMeow();
       onCreated(trimmedName);
     } catch {
-      Alert.alert('Oops', 'Something went wrong. Please try again.');
+      Alert.alert(t('onboarding.oops'), t('onboarding.somethingWentWrong'));
     }
   };
 
@@ -310,7 +295,7 @@ function CreateCatStep({
           onPress={onSkip}
           hitSlop={12}
           accessibilityRole="button"
-          accessibilityLabel="Skip adding a cat"
+          accessibilityLabel={t('common.skip')}
           style={({ pressed }) => ({ opacity: pressed ? 0.5 : 1 })}
         >
           <Text
@@ -320,7 +305,7 @@ function CreateCatStep({
               color: theme.colors.textMuted,
             }}
           >
-            Skip
+            {t('common.skip')}
           </Text>
         </Pressable>
       </Animated.View>
@@ -356,7 +341,7 @@ function CreateCatStep({
               lineHeight: 36,
             }}
           >
-            Add Your{'\n'}First Cat
+            {t('onboarding.addFirstCat')}
           </Text>
           <Text
             style={{
@@ -368,7 +353,7 @@ function CreateCatStep({
               lineHeight: 22,
             }}
           >
-            Start tracking right away! You can always{'\n'}add more cats later.
+            {t('onboarding.addFirstCatMessage')}
           </Text>
         </Animated.View>
 
@@ -378,9 +363,9 @@ function CreateCatStep({
           style={{ gap: 14 }}
         >
           <Input
-            label="Cat's Name"
+            label={t('onboarding.catName')}
             value={name}
-            onChangeText={(t) => { setName(t); setNameError(''); }}
+            onChangeText={(v) => { setName(v); setNameError(''); }}
             autoCapitalize="words"
             autoFocus
             returnKeyType="next"
@@ -388,7 +373,7 @@ function CreateCatStep({
           />
           <View style={{ flexDirection: 'row', gap: 12 }}>
             <Input
-              label="Weight (kg)"
+              label={t('onboarding.weight')}
               value={weight}
               onChangeText={setWeight}
               keyboardType="decimal-pad"
@@ -396,7 +381,7 @@ function CreateCatStep({
               containerStyle={{ flex: 1 }}
             />
             <Input
-              label="Age (years)"
+              label={t('onboarding.age')}
               value={age}
               onChangeText={setAge}
               keyboardType="number-pad"
@@ -412,7 +397,7 @@ function CreateCatStep({
           style={{ marginTop: 28, gap: 16, alignItems: 'center' }}
         >
           <Button
-            title="Add Cat"
+            title={t('onboarding.addCat')}
             onPress={handleAdd}
             loading={createCat.isPending}
             style={{ width: '100%' }}
@@ -431,6 +416,7 @@ function FinaleStep({
   catName: string | null;
   onFinish: () => void;
 }) {
+  const { t } = useTranslation();
   const insets = useSafeAreaInsets();
 
   return (
@@ -464,7 +450,7 @@ function FinaleStep({
             lineHeight: 40,
           }}
         >
-          You're All Set!
+          {t('onboarding.allSet')}
         </Text>
         <Text
           style={{
@@ -478,8 +464,8 @@ function FinaleStep({
           }}
         >
           {catName
-            ? `${catName}'s fitness journey starts now.\nLet's get playing!`
-            : 'Time to add your cats and start tracking\ntheir playtime!'}
+            ? t('onboarding.catJourneyStarts', { name: catName })
+            : t('onboarding.addCatsAndTrack')}
         </Text>
       </Animated.View>
 
@@ -493,7 +479,7 @@ function FinaleStep({
         }}
       >
         <Button
-          title="Get Started"
+          title={t('onboarding.getStarted')}
           onPress={onFinish}
           style={{ width: '100%' }}
         />
@@ -503,13 +489,39 @@ function FinaleStep({
 }
 
 export default function OnboardingScreen() {
+  const { t } = useTranslation();
   const { width } = useWindowDimensions();
   const insets = useSafeAreaInsets();
   const scrollX = useSharedValue(0);
-  const flatListRef = useRef<Animated.FlatList<(typeof steps)[number]>>(null);
   const [activeIndex, setActiveIndex] = useState(0);
   const [phase, setPhase] = useState<Phase>('intro');
   const [createdCatName, setCreatedCatName] = useState<string | null>(null);
+
+  const steps: Step[] = useMemo(
+    () => [
+      {
+        id: '1',
+        icon: require('@/assets/icons/paw.png'),
+        title: t('onboarding.welcomeTitle'),
+        message: t('onboarding.welcomeMessage'),
+      },
+      {
+        id: '2',
+        icon: require('@/assets/icons/cat-face.png'),
+        title: t('onboarding.trackTitle'),
+        message: t('onboarding.trackMessage'),
+      },
+      {
+        id: '3',
+        icon: require('@/assets/icons/stats.png'),
+        title: t('onboarding.insightsTitle'),
+        message: t('onboarding.insightsMessage'),
+      },
+    ],
+    [t]
+  );
+
+  const flatListRef = useRef<Animated.FlatList<Step>>(null);
 
   const scrollHandler = useAnimatedScrollHandler({
     onScroll: (event) => {
@@ -532,7 +544,7 @@ export default function OnboardingScreen() {
     } else {
       setPhase('create-cat');
     }
-  }, [activeIndex]);
+  }, [activeIndex, steps.length]);
 
   const handleCatCreated = useCallback((name: string) => {
     setCreatedCatName(name);
@@ -584,7 +596,7 @@ export default function OnboardingScreen() {
           onPress={() => setPhase('create-cat')}
           hitSlop={12}
           accessibilityRole="button"
-          accessibilityLabel="Skip intro"
+          accessibilityLabel={t('common.skip')}
           style={({ pressed }) => ({ opacity: pressed ? 0.5 : 1 })}
         >
           <Text
@@ -594,7 +606,7 @@ export default function OnboardingScreen() {
               color: theme.colors.textMuted,
             }}
           >
-            Skip
+            {t('common.skip')}
           </Text>
         </Pressable>
       </Animated.View>
@@ -643,7 +655,7 @@ export default function OnboardingScreen() {
 
         {/* Action button */}
         <Button
-          title={activeIndex === steps.length - 1 ? 'Continue' : 'Next'}
+          title={activeIndex === steps.length - 1 ? t('common.continue') : t('common.next')}
           onPress={handleNext}
           style={{ width: '100%' }}
         />

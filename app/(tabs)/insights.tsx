@@ -2,6 +2,7 @@ import React, { useMemo } from 'react';
 import { ScrollView, Text, View } from 'react-native';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useTranslation } from 'react-i18next';
 
 import { StatRow } from '@/src/components/insights/stat-row';
 import { WeeklyBar } from '@/src/components/insights/weekly-bar';
@@ -15,6 +16,7 @@ import { theme } from '@/src/theme';
 import { ACTIVITY_TYPES } from '@/src/utils/activity-types';
 
 export default function InsightsScreen() {
+  const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   const { data: cats } = useCats();
   const { data: sessions, isLoading } = useWeeklySessions();
@@ -78,7 +80,7 @@ export default function InsightsScreen() {
               color: theme.colors.text,
             }}
           >
-            Insights
+            {t('insights.title')}
           </Text>
         </Animated.View>
 
@@ -90,8 +92,8 @@ export default function InsightsScreen() {
         ) : !sessions || sessions.length === 0 ? (
           <EmptyState
             emoji={'\u{1F4C8}'}
-            title="No data yet"
-            message="Log some play sessions this week to see your insights!"
+            title={t('insights.noDataYet')}
+            message={t('insights.noDataMessage')}
           />
         ) : (
           <>
@@ -106,7 +108,7 @@ export default function InsightsScreen() {
                     marginBottom: 16,
                   }}
                 >
-                  This Week
+                  {t('insights.thisWeek')}
                 </Text>
                 <WeeklyBar sessions={sessions} />
               </Card>
@@ -123,27 +125,27 @@ export default function InsightsScreen() {
                     marginBottom: 8,
                   }}
                 >
-                  Weekly Stats
+                  {t('insights.weeklyStats')}
                 </Text>
                 <StatRow
-                  label="Total Sessions"
+                  label={t('insights.totalSessions')}
                   value={stats.totalSessions}
                   icon={'\u{1F3AF}'}
                 />
                 <StatRow
-                  label="Total Minutes"
+                  label={t('insights.totalMinutes')}
                   value={`${stats.totalMinutes} min`}
                   icon={'\u{23F1}\uFE0F'}
                 />
                 <StatRow
-                  label="Avg Duration"
+                  label={t('insights.avgDuration')}
                   value={`${stats.avgDuration} min`}
                   icon={'\u{1F4C9}'}
                 />
                 {stats.favoriteActivity && (
                   <StatRow
-                    label="Favorite Activity"
-                    value={`${stats.favoriteActivity.emoji} ${stats.favoriteActivity.label}`}
+                    label={t('insights.favoriteActivity')}
+                    value={`${stats.favoriteActivity.emoji} ${t(stats.favoriteActivity.label)}`}
                     icon={'\u{2B50}'}
                   />
                 )}
@@ -161,7 +163,7 @@ export default function InsightsScreen() {
                     marginBottom: 8,
                   }}
                 >
-                  Per Cat
+                  {t('insights.perCat')}
                 </Text>
                 <View style={{ gap: 8 }}>
                   {catBreakdown.map(({ cat, sessions: count, minutes }) => (
@@ -192,7 +194,7 @@ export default function InsightsScreen() {
                               fontVariant: ['tabular-nums'],
                             }}
                           >
-                            {count} sessions - {minutes} min
+                            {t('insights.sessionsMinutes', { count, minutes })}
                           </Text>
                         </View>
                       </View>

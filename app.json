@@ -42,7 +42,8 @@
         }
       ],
       "expo-notifications",
-      "expo-live-activity"
+      "expo-live-activity",
+      "expo-localization"
     ],
     "experiments": {
       "typedRoutes": true,

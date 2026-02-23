@@ -1,4 +1,5 @@
 import type { Range } from './types';
+import i18n from '@/src/i18n';
 
 // ============================================
 // Veterinary-backed knowledge base
@@ -89,189 +90,196 @@ export const ACTIVITY_INTENSITY_MAP: Record<string, { intensity: 'low' | 'modera
 /**
  * Legacy toy catalog — kept for backward compatibility with toy-recommender.
  * See activities.ts for the new comprehensive catalog.
+ * Returns translated strings via i18n.t().
  */
-export const TOY_CATALOG = [
+export function getToyCalog() {
+  return [
   {
     toy_category: 'wand_feather_teaser',
-    label: 'Wand / Feather Teaser',
+    label: i18n.t('catFitness.toyWandLabel'),
     emoji: '\u{1FA84}',
     activity_types: ['stalk', 'chase', 'pounce', 'jump'] as const,
     intensity: 'moderate' as const,
     joint_impact: 'moderate' as const,
     best_for_life_stages: ['kitten', 'young_adult', 'mature_adult'] as const,
     best_for_weight_bands: ['lt_4kg', '4_to_5_5kg', 'gt_5_5kg'] as const,
-    session_structure: 'Start slow (mimicking prey hiding) \u2192 build to active chase (2\u20133 min) \u2192 let cat "catch" prey \u2192 repeat 3\u20134 cycles \u2192 end with a catch and treat.',
+    session_structure: i18n.t('catFitness.toyWandSession'),
     safety_notes: [
-      'Never leave string/feather toys unattended \u2014 ingestion risk.',
-      'Replace frayed feathers promptly.',
-      'Let cat "win" regularly to prevent frustration.',
+      i18n.t('catFitness.toyWandSafety1'),
+      i18n.t('catFitness.toyWandSafety2'),
+      i18n.t('catFitness.toyWandSafety3'),
     ],
   },
   {
     toy_category: 'laser_pointer',
-    label: 'Laser Pointer',
+    label: i18n.t('catFitness.toyLaserLabel'),
     emoji: '\u{1F534}',
     activity_types: ['chase', 'pounce'] as const,
     intensity: 'high' as const,
     joint_impact: 'moderate' as const,
     best_for_life_stages: ['kitten', 'young_adult'] as const,
     best_for_weight_bands: ['lt_4kg', '4_to_5_5kg'] as const,
-    session_structure: 'Short bursts only (3\u20135 min). Move dot along floor in prey-like patterns. MUST end by leading dot to a physical toy or treat that cat can "catch".',
+    session_structure: i18n.t('catFitness.toyLaserSession'),
     safety_notes: [
-      'ALWAYS end with a physical catch (treat or toy) \u2014 failure causes frustration and obsessive behavior.',
-      'Never shine in eyes.',
-      'Limit sessions to 5 minutes max.',
-      'Not recommended for anxious cats or cats prone to compulsive behaviors.',
+      i18n.t('catFitness.toyLaserSafety1'),
+      i18n.t('catFitness.toyLaserSafety2'),
+      i18n.t('catFitness.toyLaserSafety3'),
+      i18n.t('catFitness.toyLaserSafety4'),
     ],
   },
   {
     toy_category: 'ball_track',
-    label: 'Ball / Track Ball',
+    label: i18n.t('catFitness.toyBallLabel'),
     emoji: '\u{1F3BE}',
     activity_types: ['bat', 'chase'] as const,
     intensity: 'moderate' as const,
     joint_impact: 'low' as const,
     best_for_life_stages: ['kitten', 'young_adult', 'mature_adult', 'senior'] as const,
     best_for_weight_bands: ['lt_4kg', '4_to_5_5kg', 'gt_5_5kg'] as const,
-    session_structure: 'Roll ball to initiate. Let cat bat and chase. Works well for solo play between interactive sessions.',
+    session_structure: i18n.t('catFitness.toyBallSession'),
     safety_notes: [
-      'Choose balls too large to swallow.',
-      'Avoid balls with small detachable parts.',
+      i18n.t('catFitness.toyBallSafety1'),
+      i18n.t('catFitness.toyBallSafety2'),
     ],
   },
   {
     toy_category: 'kicker_toy',
-    label: 'Kicker Toy',
+    label: i18n.t('catFitness.toyKickerLabel'),
     emoji: '\u{1F3C8}',
     activity_types: ['kick', 'pounce'] as const,
     intensity: 'moderate' as const,
     joint_impact: 'low' as const,
     best_for_life_stages: ['kitten', 'young_adult', 'mature_adult'] as const,
     best_for_weight_bands: ['lt_4kg', '4_to_5_5kg', 'gt_5_5kg'] as const,
-    session_structure: 'Present toy \u2192 cat grabs with front paws and bunny-kicks. Great for core engagement. 5\u201310 min sessions.',
+    session_structure: i18n.t('catFitness.toyKickerSession'),
     safety_notes: [
-      'Check seams regularly for loose filling.',
-      'Replace if fabric tears.',
+      i18n.t('catFitness.toyKickerSafety1'),
+      i18n.t('catFitness.toyKickerSafety2'),
     ],
   },
   {
     toy_category: 'crinkle_toy',
-    label: 'Crinkle Toy',
+    label: i18n.t('catFitness.toyCrinkleLabel'),
     emoji: '\u{1F4E6}',
     activity_types: ['bat', 'pounce', 'stalk'] as const,
     intensity: 'low' as const,
     joint_impact: 'low' as const,
     best_for_life_stages: ['kitten', 'young_adult', 'mature_adult', 'senior'] as const,
     best_for_weight_bands: ['lt_4kg', '4_to_5_5kg', 'gt_5_5kg'] as const,
-    session_structure: 'Toss or hide crinkle toys to encourage investigation and batting.',
+    session_structure: i18n.t('catFitness.toyCrinkleSession'),
     safety_notes: [
-      'Ensure no small pieces can be chewed off and swallowed.',
+      i18n.t('catFitness.toyCrinkleSafety1'),
     ],
   },
   {
     toy_category: 'puzzle_feeder',
-    label: 'Puzzle Feeder / Food Dispensing',
+    label: i18n.t('catFitness.toyPuzzleLabel'),
     emoji: '\u{1F9E9}',
     activity_types: ['forage'] as const,
     intensity: 'low' as const,
     joint_impact: 'low' as const,
     best_for_life_stages: ['kitten', 'young_adult', 'mature_adult', 'senior'] as const,
     best_for_weight_bands: ['lt_4kg', '4_to_5_5kg', 'gt_5_5kg'] as const,
-    session_structure: 'Fill with portion of daily kibble. Start with easiest difficulty, increase gradually. 10\u201320 min engagement. Ideal for weight management.',
+    session_structure: i18n.t('catFitness.toyPuzzleSession'),
     safety_notes: [
-      'Count dispensed food as part of daily caloric intake.',
-      'Clean regularly to prevent mold.',
-      'Start with easy levels to prevent frustration.',
+      i18n.t('catFitness.toyPuzzleSafety1'),
+      i18n.t('catFitness.toyPuzzleSafety2'),
+      i18n.t('catFitness.toyPuzzleSafety3'),
     ],
   },
   {
     toy_category: 'catnip_toy',
-    label: 'Catnip Toy',
+    label: i18n.t('catFitness.toyCatnipLabel'),
     emoji: '\u{1F33F}',
     activity_types: ['bat', 'kick', 'pounce'] as const,
     intensity: 'moderate' as const,
     joint_impact: 'low' as const,
     best_for_life_stages: ['young_adult', 'mature_adult'] as const,
     best_for_weight_bands: ['lt_4kg', '4_to_5_5kg', 'gt_5_5kg'] as const,
-    session_structure: 'Present fresh catnip or catnip-infused toy. Response lasts 5\u201315 min. Allow 1\u20132 hour cooldown.',
+    session_structure: i18n.t('catFitness.toyCatnipSession'),
     safety_notes: [
-      'About 30\u201350% of cats do not respond to catnip (genetic).',
-      'Kittens under 6 months rarely respond.',
-      'Some cats become aggressive \u2014 discontinue if so.',
-      'Silver vine is an alternative for non-responders.',
+      i18n.t('catFitness.toyCatnipSafety1'),
+      i18n.t('catFitness.toyCatnipSafety2'),
+      i18n.t('catFitness.toyCatnipSafety3'),
+      i18n.t('catFitness.toyCatnipSafety4'),
     ],
   },
   {
     toy_category: 'climbing_vertical',
-    label: 'Climbing Tree / Vertical Space',
+    label: i18n.t('catFitness.toyClimbingLabel'),
     emoji: '\u{1FAB5}',
     activity_types: ['climb', 'jump'] as const,
     intensity: 'high' as const,
     joint_impact: 'high' as const,
     best_for_life_stages: ['kitten', 'young_adult'] as const,
     best_for_weight_bands: ['lt_4kg', '4_to_5_5kg'] as const,
-    session_structure: 'Encourage climbing by placing treats or toys at different levels.',
+    session_structure: i18n.t('catFitness.toyClimbingSession'),
     safety_notes: [
-      'Ensure tree is stable and secured \u2014 tip-over risk with large cats.',
-      'Not recommended for senior cats or cats with joint issues.',
-      'Overweight cats: ensure shelves support their weight.',
+      i18n.t('catFitness.toyClimbingSafety1'),
+      i18n.t('catFitness.toyClimbingSafety2'),
+      i18n.t('catFitness.toyClimbingSafety3'),
     ],
   },
   {
     toy_category: 'treat_scatter',
-    label: 'Treat Scatter / Sniffing Game',
+    label: i18n.t('catFitness.toyTreatScatterLabel'),
     emoji: '\u{1F443}',
     activity_types: ['forage', 'stalk'] as const,
     intensity: 'low' as const,
     joint_impact: 'low' as const,
     best_for_life_stages: ['kitten', 'young_adult', 'mature_adult', 'senior'] as const,
     best_for_weight_bands: ['lt_4kg', '4_to_5_5kg', 'gt_5_5kg'] as const,
-    session_structure: 'Scatter a small number of treats (5\u201310) across a room or in a snuffle mat. 5\u201315 min.',
+    session_structure: i18n.t('catFitness.toyTreatScatterSession'),
     safety_notes: [
-      'Count scattered treats as part of daily caloric intake.',
-      'Use low-calorie treats for overweight cats.',
+      i18n.t('catFitness.toyTreatScatterSafety1'),
+      i18n.t('catFitness.toyTreatScatterSafety2'),
     ],
   },
   {
     toy_category: 'automated_toy',
-    label: 'Automated / Electronic Toy',
+    label: i18n.t('catFitness.toyAutomatedLabel'),
     emoji: '\u{1F916}',
     activity_types: ['chase', 'bat', 'pounce'] as const,
     intensity: 'moderate' as const,
     joint_impact: 'low' as const,
     best_for_life_stages: ['kitten', 'young_adult', 'mature_adult'] as const,
     best_for_weight_bands: ['lt_4kg', '4_to_5_5kg', 'gt_5_5kg'] as const,
-    session_structure: 'Use as supplement, not replacement for interactive play. Limit to 10\u201315 min.',
+    session_structure: i18n.t('catFitness.toyAutomatedSession'),
     safety_notes: [
-      'Supervise electronic toys \u2014 entanglement and battery risks.',
-      'Rotate toys to prevent habituation.',
-      'Not a substitute for interactive human-cat play.',
+      i18n.t('catFitness.toyAutomatedSafety1'),
+      i18n.t('catFitness.toyAutomatedSafety2'),
+      i18n.t('catFitness.toyAutomatedSafety3'),
     ],
   },
-];
+  ];
+}
 
 /**
  * Universal stop rules — signs to immediately stop play.
  * Sources: Cornell, ISFM, AAHA, PDSA
  */
-export const STOP_RULES = [
-  'Open-mouth breathing or panting (cats should NOT pant like dogs \u2014 this indicates overexertion or respiratory distress). STOP immediately. Seek vet care if it persists beyond 2\u20133 minutes of rest.',
-  'Collapse, inability to stand, or extreme lethargy \u2014 veterinary emergency.',
-  'Blue, purple, or pale/white gums (cyanosis) \u2014 veterinary emergency.',
-  'Coughing, gagging, or wheezing during play.',
-  'Vomiting during or immediately after play.',
-  'Limping, favoring a limb, or crying out in pain.',
-  'Aggression escalation (hissing, growling, flattened ears with stiff body) \u2014 cat is overstimulated.',
-  'Hiding or attempting to escape the play area \u2014 respect the cat\'s choice.',
-  'Excessive drooling during play.',
-  'Refusing to engage after being enticed \u2014 never force play.',
-];
+export function getStopRules(): string[] {
+  return [
+    i18n.t('catFitness.stopRulePanting'),
+    i18n.t('catFitness.stopRuleCollapse'),
+    i18n.t('catFitness.stopRuleCyanosis'),
+    i18n.t('catFitness.stopRuleCoughing'),
+    i18n.t('catFitness.stopRuleVomiting'),
+    i18n.t('catFitness.stopRuleLimping'),
+    i18n.t('catFitness.stopRuleAggression'),
+    i18n.t('catFitness.stopRuleHiding'),
+    i18n.t('catFitness.stopRuleDrooling'),
+    i18n.t('catFitness.stopRuleRefusing'),
+  ];
+}
 
 /**
  * Hunt-Eat-Groom-Sleep sequence recommendation.
  */
-export const HUNT_EAT_GROOM_SLEEP =
-  'Follow the natural feline cycle: HUNT (play session simulating predatory sequence) \u2192 EAT (offer a small meal or treat immediately after) \u2192 GROOM (cat will naturally groom) \u2192 SLEEP (cat will rest). This sequence produces the most satisfying and behaviorally complete play experience. Schedule play sessions before mealtimes when possible.';
+export function getHuntEatGroomSleep(): string {
+  return i18n.t('catFitness.huntEatGroomSleep');
+}
 
-export const DISCLAIMER =
-  'All calorie estimates are approximate and based on standard veterinary energy equations (RER/MER) with conservative intensity multipliers. There is not strong direct published data for "kcal/min of cat play." Actual energy expenditure varies significantly based on individual metabolism, ambient temperature, play intensity, health status, and other factors. These figures are for general guidance only and should not replace veterinary advice. Consult a veterinarian for any weight-management program or if your cat shows signs of illness, injury, or distress during play. This app does not provide veterinary diagnosis.';
+export function getDisclaimer(): string {
+  return i18n.t('catFitness.disclaimer');
+}

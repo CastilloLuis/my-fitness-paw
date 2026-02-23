@@ -32,6 +32,7 @@ import type {
 } from './types';
 import { classifyLifeStage } from './life-stage';
 import { getActivityById } from './activities';
+import i18n from '@/src/i18n';
 
 // --- Constants ---
 
@@ -45,27 +46,31 @@ const INTENSITY_MULTIPLIERS: Record<Intensity, number> = {
 };
 
 /** MER life-stage multipliers (starting points — adjust based on weight trend + BCS) */
-const MER_MULTIPLIERS: Record<string, { factor: number; label: string }> = {
-  kitten: { factor: 2.5, label: 'Kitten/juvenile (<1 year)' },
-  neutered_adult: { factor: 1.2, label: 'Typical neutered adult' },
-  intact_adult: { factor: 1.4, label: 'Intact adult' },
-  weight_loss: { factor: 1.0, label: 'Obesity-prone / weight-loss baseline' },
-};
+function getMerMultipliers(): Record<string, { factor: number; label: string }> {
+  return {
+    kitten: { factor: 2.5, label: i18n.t('catFitness.merLabelKitten') },
+    neutered_adult: { factor: 1.2, label: i18n.t('catFitness.merLabelNeuteredAdult') },
+    intact_adult: { factor: 1.4, label: i18n.t('catFitness.merLabelIntactAdult') },
+    weight_loss: { factor: 1.0, label: i18n.t('catFitness.merLabelWeightLoss') },
+  };
+}
 
 // --- Stop rules with medical context ---
 
-const EMERGENCY_STOP_RULES: string[] = [
-  'Open-mouth breathing or panting that persists after play stops — cats should NOT pant like dogs; persistent panting indicates overexertion or respiratory distress. STOP immediately and monitor. Seek veterinary care if it continues beyond 2–3 minutes of rest. (AAHA, PDSA)',
-  'Collapse or inability to stand — stop all activity immediately and seek emergency veterinary care.',
-  'Blue, purple, or pale/white gums (cyanosis) — indicates severe oxygen deprivation. This is a veterinary emergency.',
-  'Severe lethargy or unresponsiveness during or after play — stop immediately and contact your veterinarian.',
-  'Coughing, gagging, or wheezing — may indicate respiratory distress, asthma exacerbation, or airway obstruction. Stop play and consult your vet.',
-  'Vomiting during or immediately after play.',
-  'Limping, favoring a limb, or crying out in pain — stop and assess for injury.',
-  'Aggression escalation (hissing, growling, flattened ears, stiff body with dilated pupils) — cat is overstimulated. End session calmly.',
-  'Hiding or actively fleeing the play area — respect the cat\'s choice to stop.',
-  'Excessive drooling during play (not food-related).',
-];
+function getEmergencyStopRules(): string[] {
+  return [
+    i18n.t('catFitness.emergencyStopPanting'),
+    i18n.t('catFitness.emergencyStopCollapse'),
+    i18n.t('catFitness.emergencyStopCyanosis'),
+    i18n.t('catFitness.emergencyStopLethargy'),
+    i18n.t('catFitness.emergencyStopCoughing'),
+    i18n.t('catFitness.emergencyStopVomiting'),
+    i18n.t('catFitness.emergencyStopLimping'),
+    i18n.t('catFitness.emergencyStopAggression'),
+    i18n.t('catFitness.emergencyStopHiding'),
+    i18n.t('catFitness.emergencyStopDrooling'),
+  ];
+}
 
 // --- Input validation ---
 
@@ -183,7 +188,7 @@ export function calcMER(params: {
     multiplierKey = 'neutered_adult';
   }
 
-  const { factor, label } = MER_MULTIPLIERS[multiplierKey];
+  const { factor, label } = getMerMultipliers()[multiplierKey];
   const merKcalPerDay = rer.rerKcalPerDay * factor;
 
   return {
@@ -233,13 +238,12 @@ export function buildSafetyConstraints(
       dailyTotal = { min: 10, max: 15, unit: 'minutes' };
       sessionsPerDay = { min: 2, max: 4, unit: 'sessions' };
       intensityCap = 'low';
-      restSuggestion =
-        'After each micro-session (3–5 min), allow a full rest period of at least 10 minutes. If the cat shows any signs of heavy breathing, extend rest to 30 minutes or more. Increase session duration by only 10–20% per week if the cat tolerates it without distress.';
+      restSuggestion = i18n.t('catFitness.restSuggestionObese');
       warnings.push(
-        'This cat is classified as obese (BCS 8–9). Obesity places extra strain on the heart, lungs, and joints. Play sessions must be short, low-intensity micro-sessions with mandatory rest breaks. Consult your veterinarian before starting any exercise program.'
+        i18n.t('catFitness.safetyObeseWarning1')
       );
       warnings.push(
-        'Obese cats are at increased risk of respiratory distress during exertion. Watch closely for open-mouth breathing, panting, or reluctance to continue. Stop immediately if any of these occur.'
+        i18n.t('catFitness.safetyObeseWarning2')
       );
       break;
 
@@ -249,10 +253,9 @@ export function buildSafetyConstraints(
       dailyTotal = { min: 15, max: 25, unit: 'minutes' };
       sessionsPerDay = { min: 2, max: 4, unit: 'sessions' };
       intensityCap = 'moderate';
-      restSuggestion =
-        'Rest for at least 5 minutes between sessions. Increase duration by 10–20% per week if tolerated. If the cat is not yet used to regular play, start at the lower end and progress gradually over 3–4 weeks.';
+      restSuggestion = i18n.t('catFitness.restSuggestionOverweight');
       warnings.push(
-        'This cat is classified as overweight (BCS 7). Sessions should be shorter and more frequent with moderate intensity. Gradual ramps are important — do not push for rapid increases in duration or intensity.'
+        i18n.t('catFitness.safetyOverweightWarning')
       );
       break;
 
@@ -270,10 +273,9 @@ export function buildSafetyConstraints(
     intensityCap = 'low';
     maxContinuous = { min: 2, max: 4, unit: 'minutes' };
     breakMinutes = Math.max(breakMinutes, 15);
-    restSuggestion =
-      'This cat has known cardiac or respiratory disease. Only very gentle, low-intensity activity is recommended. Rest for at least 15 minutes between sessions. Consult your veterinarian for a specific exercise plan.';
+    restSuggestion = i18n.t('catFitness.restSuggestionCardiac');
     warnings.push(
-      'KNOWN CARDIAC OR RESPIRATORY DISEASE: Only very gentle, supervised play is appropriate. Stop at the first sign of labored breathing, coughing, or fatigue. Your veterinarian should approve any exercise program.'
+      i18n.t('catFitness.safetyCardiacWarning')
     );
   }
 
@@ -283,14 +285,14 @@ export function buildSafetyConstraints(
       maxContinuous = { min: Math.max(2, maxContinuous.min - 2), max: Math.max(4, maxContinuous.max - 3), unit: 'minutes' };
     }
     warnings.push(
-      'Hot ambient temperature detected. Cats dissipate heat poorly. Reduce session length and intensity. Ensure fresh water is available. Stop play if any panting occurs.'
+      i18n.t('catFitness.safetyHotWarning')
     );
   }
 
   if (profile.mobility_limitations) {
     intensityCap = 'low';
     warnings.push(
-      'Mobility limitations present. Only low-impact, ground-level activities recommended. Avoid jumping or climbing.'
+      i18n.t('catFitness.safetyMobilityWarning')
     );
   }
 
@@ -301,13 +303,13 @@ export function buildSafetyConstraints(
       maxContinuous = { ...maxContinuous, max: 12 };
     }
     warnings.push(
-      'Senior cat: monitor closely for signs of pain or fatigue. Seniors may need longer warm-up periods and gentler activities.'
+      i18n.t('catFitness.safetySeniorWarning')
     );
   }
 
   if (profile.age_months > 180) {
     warnings.push(
-      'Geriatric cat (15+ years): increased veterinary monitoring recommended. Very gentle play only.'
+      i18n.t('catFitness.safetyGeriatricWarning')
     );
   }
 
@@ -317,7 +319,7 @@ export function buildSafetyConstraints(
     recommendedDailyTotalMinutes: dailyTotal,
     recommendedSessionsPerDay: sessionsPerDay,
     intensityCap,
-    stopRules: EMERGENCY_STOP_RULES,
+    stopRules: getEmergencyStopRules(),
     warnings,
     restSuggestion,
   };
@@ -395,14 +397,14 @@ export function estimatePlayCalories(params: {
   ) {
     intensityLevel = safety.intensityCap;
     safety.warnings.push(
-      `Intensity was capped to "${safety.intensityCap}" based on this cat's health profile.`
+      i18n.t('catFitness.intensityCappedWarning', { cap: safety.intensityCap })
     );
   }
 
   // Duration warning
   if (durationMinutes > safety.maxContinuousMinutes.max) {
     safety.warnings.push(
-      `Requested duration (${durationMinutes} min) exceeds the recommended maximum continuous play of ${safety.maxContinuousMinutes.min}–${safety.maxContinuousMinutes.max} min for this cat. Break the session into shorter segments with rest periods of at least ${safety.recommendedBreakMinutes} minutes between them.`
+      i18n.t('catFitness.durationExceededWarning', { duration: durationMinutes, min: safety.maxContinuousMinutes.min, max: safety.maxContinuousMinutes.max, breakMinutes: safety.recommendedBreakMinutes })
     );
   }
 
@@ -525,17 +527,17 @@ function buildProgressionPlan(
     let notes: string;
     if (week === 1) {
       if (obesityStatus === 'obese') {
-        notes = 'Start very gently. Focus on engagement, not exertion. Low intensity only. Stop immediately if any panting or heavy breathing occurs.';
+        notes = i18n.t('catFitness.energyProgressWeek1Obese');
       } else if (obesityStatus === 'overweight') {
-        notes = 'Start gentle. Short sessions at low-to-moderate intensity. Monitor breathing throughout.';
+        notes = i18n.t('catFitness.energyProgressWeek1Overweight');
       } else {
-        notes = 'Introduce short play sessions. Focus on building a consistent routine.';
+        notes = i18n.t('catFitness.energyProgressWeek1Normal');
       }
     } else if (week === totalWeeks) {
-      notes = 'Full target duration reached. Maintain this level. Continue to monitor for signs of fatigue.';
+      notes = i18n.t('catFitness.energyProgressWeekFinal');
     } else {
       const pctIncrease = obesityStatus === 'obese' ? '10–15%' : '15–20%';
-      notes = `Gradually increase session length by ${pctIncrease} from previous week. Monitor for fatigue and adjust accordingly.`;
+      notes = i18n.t('catFitness.energyProgressWeekMid', { pct: pctIncrease });
     }
 
     weeks.push({ week, sessions_per_day: sessionsPerDay, minutes_per_session: minPerSession, notes });

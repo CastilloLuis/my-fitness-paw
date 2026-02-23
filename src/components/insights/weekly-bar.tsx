@@ -8,6 +8,7 @@ import Animated, {
   Easing,
 } from 'react-native-reanimated';
 import { format, startOfWeek, addDays } from 'date-fns';
+import { useTranslation } from 'react-i18next';
 import { theme } from '@/src/theme';
 import type { PlaySession } from '@/src/supabase/types';
 
@@ -17,7 +18,7 @@ interface WeeklyBarProps {
   sessions: PlaySession[];
 }
 
-const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+const DAY_KEYS = ['weekly.dayMon', 'weekly.dayTue', 'weekly.dayWed', 'weekly.dayThu', 'weekly.dayFri', 'weekly.daySat', 'weekly.daySun'];
 const BAR_WIDTH = 32;
 const CHART_HEIGHT = 140;
 
@@ -57,10 +58,11 @@ function AnimatedBar({
 }
 
 export function WeeklyBar({ sessions }: WeeklyBarProps) {
+  const { t } = useTranslation();
   const weekStart = startOfWeek(new Date(), { weekStartsOn: 1 });
 
   // Aggregate minutes per day
-  const dailyMinutes = DAYS.map((_, i) => {
+  const dailyMinutes = DAY_KEYS.map((_, i) => {
     const day = addDays(weekStart, i);
     const dayStart = new Date(day);
     dayStart.setHours(0, 0, 0, 0);
@@ -76,7 +78,7 @@ export function WeeklyBar({ sessions }: WeeklyBarProps) {
   });
 
   const maxMinutes = Math.max(...dailyMinutes, 1);
-  const totalWidth = DAYS.length * (BAR_WIDTH + 12) - 12;
+  const totalWidth = DAY_KEYS.length * (BAR_WIDTH + 12) - 12;
   const today = new Date().getDay();
   // Convert to Mon=0 index
   const todayIndex = today === 0 ? 6 : today - 1;
@@ -116,9 +118,9 @@ export function WeeklyBar({ sessions }: WeeklyBarProps) {
           marginTop: 8,
         }}
       >
-        {DAYS.map((day, i) => (
+        {DAY_KEYS.map((key, i) => (
           <View
-            key={day}
+            key={key}
             style={{
               width: BAR_WIDTH + 12,
               alignItems: 'center',
@@ -135,7 +137,7 @@ export function WeeklyBar({ sessions }: WeeklyBarProps) {
                     : theme.colors.textMuted,
               }}
             >
-              {day}
+              {t(key)}
             </Text>
             <Text
               style={{

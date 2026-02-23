@@ -15,6 +15,7 @@ import { Image, type ImageSource } from 'expo-image';
 import type { SharedValue } from 'react-native-reanimated';
 import { router } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useTranslation } from 'react-i18next';
 
 import { Button } from '@/src/components/ui/button';
 import { theme } from '@/src/theme';
@@ -321,6 +322,7 @@ function Dots({ count, active }: { count: number; active: number }) {
 export default function WelcomeScreen() {
   const insets = useSafeAreaInsets();
   const [activeIndex, setActiveIndex] = useState(0);
+  const { t } = useTranslation();
 
   const handleCycle = React.useCallback(() => {
     setActiveIndex((prev) => (prev + 1) % CHARACTERS.length);
@@ -383,7 +385,7 @@ export default function WelcomeScreen() {
                 lineHeight: 22,
               }}
             >
-              Track your cat's fitness journey
+              {t('auth.trackCatFitness')}
             </Text>
           </Animated.View>
         </View>
@@ -394,11 +396,11 @@ export default function WelcomeScreen() {
           style={{ gap: 12 }}
         >
           <Button
-            title="Log In"
+            title={t('auth.logIn')}
             onPress={() => router.push('/(auth)/login')}
           />
           <Button
-            title="Create Account"
+            title={t('auth.createAccount')}
             onPress={() => router.push('/(auth)/register')}
             variant="secondary"
           />

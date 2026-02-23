@@ -1,6 +1,6 @@
 import type { CatProfile, ToyRecommendation, LifeStage, WeightBand } from './types';
 import { classifyLifeStage, classifyWeightBand, isOverweight } from './life-stage';
-import { TOY_CATALOG, SENIOR_MOBILITY_MODIFIERS } from './knowledge-base';
+import { getToyCalog, SENIOR_MOBILITY_MODIFIERS } from './knowledge-base';
 
 /**
  * Generate ranked toy recommendations for a specific cat profile.
@@ -12,7 +12,7 @@ export function recommendToys(profile: CatProfile): ToyRecommendation[] {
   const overweight = isOverweight(profile);
   const hasMobility = profile.mobility_limitations;
 
-  return TOY_CATALOG.map((toy) => {
+  return getToyCalog().map((toy) => {
     let score = 0.5; // base score
 
     // Life stage match

@@ -1,4 +1,5 @@
 import * as Notifications from 'expo-notifications';
+import i18n from '@/src/i18n';
 import type { Cat } from '@/src/supabase/types';
 
 // Show notifications even when app is in foreground (useful for dev testing)
@@ -15,17 +16,17 @@ Notifications.setNotificationHandler({
 // Android notification channel
 if (process.env.EXPO_OS === 'android') {
   Notifications.setNotificationChannelAsync('play-reminders', {
-    name: 'Play Reminders',
+    name: i18n.t('notifications.playReminders'),
     importance: Notifications.AndroidImportance.HIGH,
     sound: 'default',
   });
 }
 
 const REMINDER_MESSAGES = [
-  (name: string) => `${name} hasn't played today! Time to grab a toy 🪶`,
-  (name: string) => `${name} is getting restless... a quick play session would help! 🐾`,
-  (name: string) => `${name} misses playtime with you! 😿`,
-  (name: string) => `${name} needs their daily exercise. Let's go! 💪`,
+  (name: string) => i18n.t('notifications.reminder1', { name }),
+  (name: string) => i18n.t('notifications.reminder2', { name }),
+  (name: string) => i18n.t('notifications.reminder3', { name }),
+  (name: string) => i18n.t('notifications.reminder4', { name }),
 ];
 
 export async function getNotificationPermissionStatus(): Promise<boolean> {
@@ -63,7 +64,7 @@ export async function scheduleDailyReminders(cats: Cat[]) {
 
       await Notifications.scheduleNotificationAsync({
         content: {
-          title: '🐱 Playtime Reminder',
+          title: `\u{1F431} ${i18n.t('notifications.playtimeReminder')}`,
           body: messageFn(cat.name),
           sound: 'default',
           ...(process.env.EXPO_OS === 'android' && {
@@ -85,16 +86,16 @@ export async function cancelAllReminders() {
 
 export async function sendTestNotification() {
   const messages = [
-    'Mochi wants to play! 🐾',
-    'Your cats miss you! Time for a play session 🪶',
-    'A tired cat is a happy cat! Let\'s exercise 💪',
-    'Meow! Someone needs attention 😿',
+    i18n.t('notifications.test1'),
+    i18n.t('notifications.test2'),
+    i18n.t('notifications.test3'),
+    i18n.t('notifications.test4'),
   ];
   const body = messages[Math.floor(Math.random() * messages.length)];
 
   await Notifications.scheduleNotificationAsync({
     content: {
-      title: '🐱 Playtime Reminder',
+      title: `\u{1F431} ${i18n.t('notifications.playtimeReminder')}`,
       body,
       sound: 'default',
       ...(process.env.EXPO_OS === 'android' && {

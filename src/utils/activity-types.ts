@@ -9,15 +9,15 @@ export interface ActivityType {
 }
 
 export const ACTIVITY_TYPES: ActivityType[] = [
-  { id: 'wand', catalogId: 'prey_mimic_wand', label: 'Wand / Feather', emoji: '\u{1FA84}', color: '#E98A2A', minutesGoal: 10 },
-  { id: 'fetch', catalogId: 'chase_pounce_fetch', label: 'Chase & Fetch', emoji: '\u{1F3C3}', color: '#2F7D57', minutesGoal: 10 },
-  { id: 'laser', catalogId: 'laser_pointer', label: 'Laser Pointer', emoji: '\u{1F534}', color: '#B33A2B', minutesGoal: 5 },
-  { id: 'puzzle', catalogId: 'foraging_puzzle_feeder', label: 'Puzzle Feeder', emoji: '\u{1F9E9}', color: '#6B8E6B', minutesGoal: 15 },
-  { id: 'kicker', catalogId: 'kick_wrestle_kicker', label: 'Kicker Toy', emoji: '\u{1F41F}', color: '#C06040', minutesGoal: 8 },
-  { id: 'hide', catalogId: 'hide_ambush_box', label: 'Hide & Ambush', emoji: '\u{1F4E6}', color: '#8B7355', minutesGoal: 12 },
-  { id: 'climb', catalogId: 'climb_vertical_tree', label: 'Climbing', emoji: '\u{1F9D7}', color: '#5A7A8A', minutesGoal: 10 },
-  { id: 'catnip', catalogId: 'catnip_silvervine', label: 'Catnip / Silver Vine', emoji: '\u{1F33F}', color: '#4A8A5A', minutesGoal: 10 },
-  { id: 'free_roam', catalogId: null, label: 'Free Play', emoji: '\u{1F43E}', color: '#8A5A3C', minutesGoal: 15 },
+  { id: 'wand', catalogId: 'prey_mimic_wand', label: 'activities.wand', emoji: '\u{1FA84}', color: '#E98A2A', minutesGoal: 10 },
+  { id: 'fetch', catalogId: 'chase_pounce_fetch', label: 'activities.fetch', emoji: '\u{1F3C3}', color: '#2F7D57', minutesGoal: 10 },
+  { id: 'laser', catalogId: 'laser_pointer', label: 'activities.laser', emoji: '\u{1F534}', color: '#B33A2B', minutesGoal: 5 },
+  { id: 'puzzle', catalogId: 'foraging_puzzle_feeder', label: 'activities.puzzle', emoji: '\u{1F9E9}', color: '#6B8E6B', minutesGoal: 15 },
+  { id: 'kicker', catalogId: 'kick_wrestle_kicker', label: 'activities.kicker', emoji: '\u{1F41F}', color: '#C06040', minutesGoal: 8 },
+  { id: 'hide', catalogId: 'hide_ambush_box', label: 'activities.hide', emoji: '\u{1F4E6}', color: '#8B7355', minutesGoal: 12 },
+  { id: 'climb', catalogId: 'climb_vertical_tree', label: 'activities.climb', emoji: '\u{1F9D7}', color: '#5A7A8A', minutesGoal: 10 },
+  { id: 'catnip', catalogId: 'catnip_silvervine', label: 'activities.catnip', emoji: '\u{1F33F}', color: '#4A8A5A', minutesGoal: 10 },
+  { id: 'free_roam', catalogId: null, label: 'activities.freeRoam', emoji: '\u{1F43E}', color: '#8A5A3C', minutesGoal: 15 },
 ];
 
 export function getActivityType(id: string): ActivityType | undefined {

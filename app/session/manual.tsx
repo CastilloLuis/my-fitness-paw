@@ -11,6 +11,7 @@ import { router } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
+import { useTranslation } from 'react-i18next';
 
 import { useCats } from '@/src/hooks/use-cats';
 import { useCreateSession } from '@/src/hooks/use-sessions';
@@ -22,6 +23,7 @@ import { Skeleton } from '@/src/components/ui/skeleton';
 import { theme } from '@/src/theme';
 
 export default function ManualLogScreen() {
+  const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   const { data: cats, isLoading: catsLoading } = useCats();
   const createSession = useCreateSession();
@@ -34,20 +36,20 @@ export default function ManualLogScreen() {
 
   const handleSave = async () => {
     if (!selectedCatId) {
-      setError('Please select a cat');
+      setError(t('session.selectCat'));
       return;
     }
     if (!selectedActivity) {
-      setError('Please select an activity');
+      setError(t('session.selectActivity'));
       return;
     }
     const mins = parseInt(duration, 10);
     if (!mins || mins < 1) {
-      setError('Please enter a valid duration');
+      setError(t('session.validDuration'));
       return;
     }
     if (mins > 180) {
-      setError('Duration cannot exceed 3 hours');
+      setError(t('session.maxDuration'));
       return;
     }
 
@@ -64,7 +66,7 @@ export default function ManualLogScreen() {
       }
       router.back();
     } catch (e: any) {
-      Alert.alert('Error', e.message || 'Failed to save session');
+      Alert.alert(t('common.error'), e.message || t('session.failedToSave'));
     }
   };
 
@@ -115,7 +117,7 @@ export default function ManualLogScreen() {
                 color: theme.colors.text,
               }}
             >
-              Log Session
+              {t('session.logSession')}
             </Text>
           </View>
 
@@ -129,7 +131,7 @@ export default function ManualLogScreen() {
                 marginBottom: 10,
               }}
             >
-              Which cat?
+              {t('session.whichCat')}
             </Text>
             {catsLoading ? (
               <View style={{ flexDirection: 'row', gap: 10 }}>
@@ -199,7 +201,7 @@ export default function ManualLogScreen() {
                   color: theme.colors.textMuted,
                 }}
               >
-                No cats yet — add one from the Cats tab first.
+                {t('session.noCatsAddFirst')}
               </Text>
             )}
           </View>
@@ -214,7 +216,7 @@ export default function ManualLogScreen() {
                 marginBottom: 10,
               }}
             >
-              What did you play?
+              {t('session.whatDidYouPlay')}
             </Text>
             <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
               {ACTIVITY_TYPES.map((activity) => {
@@ -229,7 +231,7 @@ export default function ManualLogScreen() {
                       }
                     }}
                     accessibilityRole="button"
-                    accessibilityLabel={activity.label}
+                    accessibilityLabel={t(activity.label)}
                     accessibilityState={{ selected }}
                     style={{
                       flexDirection: 'row',
@@ -258,7 +260,7 @@ export default function ManualLogScreen() {
                         color: selected ? activity.color : theme.colors.textMuted,
                       }}
                     >
-                      {activity.label}
+                      {t(activity.label)}
                     </Text>
                   </Pressable>
                 );
@@ -268,7 +270,7 @@ export default function ManualLogScreen() {
 
           {/* Duration */}
           <Input
-            label="Duration (minutes)"
+            label={t('session.durationMinutes')}
             value={duration}
             onChangeText={setDuration}
             keyboardType="number-pad"
@@ -277,7 +279,7 @@ export default function ManualLogScreen() {
 
           {/* Notes */}
           <Input
-            label="Notes (optional)"
+            label={t('session.notesOptional')}
             value={notes}
             onChangeText={setNotes}
             multiline
@@ -302,11 +304,11 @@ export default function ManualLogScreen() {
           {/* Save */}
           <View style={{ gap: 8 }}>
             <Button
-              title="Save Session"
+              title={t('session.saveSession')}
               onPress={handleSave}
               loading={createSession.isPending}
             />
-            <Button title="Cancel" onPress={() => router.back()} variant="ghost" />
+            <Button title={t('common.cancel')} onPress={() => router.back()} variant="ghost" />
           </View>
         </ScrollView>
       </KeyboardAvoidingView>

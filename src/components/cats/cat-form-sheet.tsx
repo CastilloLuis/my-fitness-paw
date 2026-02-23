@@ -9,16 +9,17 @@ import {
 import * as Haptics from 'expo-haptics';
 import * as ImagePicker from 'expo-image-picker';
 import { Image } from 'expo-image';
+import { useTranslation } from 'react-i18next';
 import { Input } from '@/src/components/ui/input';
 import { Button } from '@/src/components/ui/button';
 import { theme } from '@/src/theme';
 import { useCreateCat, useUpdateCat } from '@/src/hooks/use-cats';
 import type { Cat, EnergyLevel } from '@/src/supabase/types';
 
-const ENERGY_LEVELS: { value: EnergyLevel; label: string; emoji: string }[] = [
-  { value: 'couch_potato', label: 'Couch Potato', emoji: '\u{1F6CB}\uFE0F' },
-  { value: 'balanced', label: 'Balanced', emoji: '\u{2696}\uFE0F' },
-  { value: 'wild_hunter', label: 'Wild Hunter', emoji: '\u{26A1}' },
+const ENERGY_LEVELS: { value: EnergyLevel; labelKey: string; emoji: string }[] = [
+  { value: 'couch_potato', labelKey: 'cats.couchPotato', emoji: '\u{1F6CB}\uFE0F' },
+  { value: 'balanced', labelKey: 'cats.balanced', emoji: '\u{2696}\uFE0F' },
+  { value: 'wild_hunter', labelKey: 'cats.wildHunter', emoji: '\u{26A1}' },
 ];
 
 interface CatFormSheetProps {
@@ -27,6 +28,7 @@ interface CatFormSheetProps {
 }
 
 export function CatFormSheet({ onClose, cat }: CatFormSheetProps) {
+  const { t } = useTranslation();
   const isEdit = !!cat;
 
   const [name, setName] = useState(cat?.name ?? '');
@@ -60,7 +62,7 @@ export function CatFormSheet({ onClose, cat }: CatFormSheetProps) {
 
   const handleSave = async () => {
     if (!name.trim()) {
-      setError('Please give your cat a name');
+      setError(t('cats.pleaseName'));
       return;
     }
 
@@ -85,7 +87,7 @@ export function CatFormSheet({ onClose, cat }: CatFormSheetProps) {
       }
       onClose();
     } catch (e: any) {
-      setError(e.message || `Failed to ${isEdit ? 'update' : 'add'} cat`);
+      setError(e.message || (isEdit ? t('cats.failedToUpdate') : t('cats.failedToAdd')));
     }
   };
 
@@ -112,7 +114,7 @@ export function CatFormSheet({ onClose, cat }: CatFormSheetProps) {
             textAlign: 'center',
           }}
         >
-          {isEdit ? 'Edit Cat' : 'Add a New Cat'}
+          {isEdit ? t('cats.editCat') : t('cats.addNewCat')}
         </Text>
 
         {/* Photo section */}
@@ -120,7 +122,7 @@ export function CatFormSheet({ onClose, cat }: CatFormSheetProps) {
           <Pressable
             onPress={pickImage}
             accessibilityRole="button"
-            accessibilityLabel={imageBase64 ? 'Change photo' : 'Add photo'}
+            accessibilityLabel={imageBase64 ? t('cats.changePhoto') : t('cats.addPhoto')}
             style={{
               width: photoSize,
               height: photoSize,
@@ -153,7 +155,7 @@ export function CatFormSheet({ onClose, cat }: CatFormSheetProps) {
                 color: theme.colors.primary,
               }}
             >
-              {imageBase64 ? 'Change Photo' : 'Add Photo'}
+              {imageBase64 ? t('cats.changePhoto') : t('cats.addPhoto')}
             </Text>
           </Pressable>
           {imageBase64 && (
@@ -168,24 +170,24 @@ export function CatFormSheet({ onClose, cat }: CatFormSheetProps) {
                   color: theme.colors.danger,
                 }}
               >
-                Remove Photo
+                {t('cats.removePhoto')}
               </Text>
             </Pressable>
           )}
         </View>
 
         <Input
-          label="Cat Name"
+          label={t('cats.catName')}
           value={name}
           onChangeText={setName}
           error={error && !name.trim() ? error : undefined}
         />
-        <Input label="Breed (optional)" value={breed} onChangeText={setBreed} />
+        <Input label={t('cats.breedOptional')} value={breed} onChangeText={setBreed} />
 
         <View style={{ flexDirection: 'row', gap: 12 }}>
           <View style={{ flex: 1 }}>
             <Input
-              label="Age (years)"
+              label={t('cats.ageYears')}
               value={ageYears}
               onChangeText={setAgeYears}
               keyboardType="number-pad"
@@ -193,7 +195,7 @@ export function CatFormSheet({ onClose, cat }: CatFormSheetProps) {
           </View>
           <View style={{ flex: 1 }}>
             <Input
-              label="Weight (kg)"
+              label={t('cats.weightKg')}
               value={weightKg}
               onChangeText={setWeightKg}
               keyboardType="decimal-pad"
@@ -211,7 +213,7 @@ export function CatFormSheet({ onClose, cat }: CatFormSheetProps) {
               marginBottom: 8,
             }}
           >
-            Energy Level
+            {t('cats.energyLevel')}
           </Text>
           <View style={{ flexDirection: 'row', gap: 8 }}>
             {ENERGY_LEVELS.map((level) => (
@@ -224,7 +226,7 @@ export function CatFormSheet({ onClose, cat }: CatFormSheetProps) {
                   }
                 }}
                 accessibilityRole="button"
-                accessibilityLabel={level.label}
+                accessibilityLabel={t(level.labelKey)}
                 accessibilityState={{ selected: energyLevel === level.value }}
                 style={{
                   flex: 1,
@@ -260,7 +262,7 @@ export function CatFormSheet({ onClose, cat }: CatFormSheetProps) {
                     textAlign: 'center',
                   }}
                 >
-                  {level.label}
+                  {t(level.labelKey)}
                 </Text>
               </Pressable>
             ))}
@@ -283,11 +285,11 @@ export function CatFormSheet({ onClose, cat }: CatFormSheetProps) {
 
         <View style={{ gap: 8, marginTop: 8 }}>
           <Button
-            title={isEdit ? 'Save Changes' : 'Add Cat'}
+            title={isEdit ? t('cats.saveChanges') : t('onboarding.addCat')}
             onPress={handleSave}
             loading={isPending}
           />
-          <Button title="Cancel" onPress={onClose} variant="ghost" />
+          <Button title={t('common.cancel')} onPress={onClose} variant="ghost" />
         </View>
       </ScrollView>
     </KeyboardAvoidingView>

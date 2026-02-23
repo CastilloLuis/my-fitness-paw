@@ -10,6 +10,7 @@ import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { openBrowserAsync } from 'expo-web-browser';
+import { useTranslation } from 'react-i18next';
 
 import { signUp } from '@/src/supabase/auth';
 import { Input } from '@/src/components/ui/input';
@@ -18,6 +19,7 @@ import { theme } from '@/src/theme';
 
 export default function RegisterScreen() {
   const insets = useSafeAreaInsets();
+  const { t } = useTranslation();
   const [displayName, setDisplayName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -33,27 +35,27 @@ export default function RegisterScreen() {
 
   const handleRegister = async () => {
     if (!displayName.trim()) {
-      setError('Please enter your name');
+      setError(t('auth.errorEnterName'));
       return;
     }
     if (!email.trim()) {
-      setError('Please enter your email');
+      setError(t('auth.errorEnterEmail'));
       return;
     }
     if (!password) {
-      setError('Please enter a password');
+      setError(t('auth.errorEnterPassword'));
       return;
     }
     if (password.length < 6) {
-      setError('Password must be at least 6 characters');
+      setError(t('auth.errorPasswordLength'));
       return;
     }
     if (password !== confirmPassword) {
-      setError('Passwords do not match');
+      setError(t('auth.errorPasswordMismatch'));
       return;
     }
     if (!acceptedTerms) {
-      setError('Please accept the Terms and Privacy Policy');
+      setError(t('auth.errorAcceptTerms'));
       return;
     }
     setLoading(true);
@@ -66,7 +68,7 @@ export default function RegisterScreen() {
         router.replace('/onboarding');
       }
     } catch (e: any) {
-      setError(e.message || 'Registration failed. Please try again.');
+      setError(e.message || t('auth.errorRegistrationFailed'));
     } finally {
       setLoading(false);
     }
@@ -94,7 +96,7 @@ export default function RegisterScreen() {
             textAlign: 'center',
           }}
         >
-          Check your email
+          {t('auth.checkYourEmail')}
         </Text>
         <Text
           style={{
@@ -105,11 +107,10 @@ export default function RegisterScreen() {
             lineHeight: 22,
           }}
         >
-          We sent a confirmation link to {email}. Tap it to activate your
-          account, then come back and log in.
+          {t('auth.confirmationSent', { email })}
         </Text>
         <Button
-          title="Back to Log In"
+          title={t('auth.backToLogIn')}
           onPress={() => router.replace('/(auth)/welcome')}
           variant="secondary"
           style={{ marginTop: 8 }}
@@ -123,7 +124,7 @@ export default function RegisterScreen() {
       onPress={toggle}
       hitSlop={12}
       accessibilityRole="button"
-      accessibilityLabel={visible ? 'Hide password' : 'Show password'}
+      accessibilityLabel={visible ? t('auth.hidePassword') : t('auth.showPassword')}
     >
       <Ionicons
         name={visible ? 'eye-off-outline' : 'eye-outline'}
@@ -151,7 +152,7 @@ export default function RegisterScreen() {
         <Pressable
           onPress={() => router.back()}
           accessibilityRole="button"
-          accessibilityLabel="Go back"
+          accessibilityLabel={t('common.back')}
           hitSlop={12}
           style={{
             width: 40,
@@ -175,7 +176,7 @@ export default function RegisterScreen() {
               color: theme.colors.text,
             }}
           >
-            Join the Pack
+            {t('auth.joinThePack')}
           </Text>
           <Text
             style={{
@@ -185,14 +186,14 @@ export default function RegisterScreen() {
               marginTop: 6,
             }}
           >
-            Create your account to get started
+            {t('auth.createYourAccount')}
           </Text>
         </View>
 
         {/* Form */}
         <View style={{ gap: 16 }}>
           <Input
-            label="Name"
+            label={t('auth.name')}
             value={displayName}
             onChangeText={(text) => { setDisplayName(text); clearError(); }}
             autoCapitalize="words"
@@ -200,7 +201,7 @@ export default function RegisterScreen() {
             returnKeyType="next"
           />
           <Input
-            label="Email"
+            label={t('auth.email')}
             value={email}
             onChangeText={(text) => { setEmail(text); clearError(); }}
             autoCapitalize="none"
@@ -210,7 +211,7 @@ export default function RegisterScreen() {
             returnKeyType="next"
           />
           <Input
-            label="Password"
+            label={t('auth.password')}
             value={password}
             onChangeText={(text) => { setPassword(text); clearError(); }}
             secureTextEntry={!showPassword}
@@ -220,7 +221,7 @@ export default function RegisterScreen() {
             rightElement={eyeIcon(showPassword, () => setShowPassword(!showPassword))}
           />
           <Input
-            label="Confirm Password"
+            label={t('auth.confirmPassword')}
             value={confirmPassword}
             onChangeText={(text) => { setConfirmPassword(text); clearError(); }}
             secureTextEntry={!showConfirm}
@@ -272,7 +273,7 @@ export default function RegisterScreen() {
                 lineHeight: 20,
               }}
             >
-              I agree to the{' '}
+              {t('auth.termsAgree')}
               <Text
                 onPress={() => openBrowserAsync('https://google.com')}
                 style={{
@@ -280,9 +281,9 @@ export default function RegisterScreen() {
                   color: theme.colors.primary,
                 }}
               >
-                Terms of Service
+                {t('auth.termsOfService')}
               </Text>
-              {' '}and{' '}
+              {t('auth.and')}
               <Text
                 onPress={() => openBrowserAsync('https://google.com')}
                 style={{
@@ -290,7 +291,7 @@ export default function RegisterScreen() {
                   color: theme.colors.primary,
                 }}
               >
-                Privacy Policy
+                {t('auth.privacyPolicy')}
               </Text>
             </Text>
           </Pressable>
@@ -322,7 +323,7 @@ export default function RegisterScreen() {
 
           {/* Primary CTA */}
           <Button
-            title="Create Account"
+            title={t('auth.createAccount')}
             onPress={handleRegister}
             loading={loading}
             disabled={!displayName.trim() || !email.trim() || !password || !confirmPassword || !acceptedTerms}
@@ -337,7 +338,7 @@ export default function RegisterScreen() {
             setTimeout(() => router.push('/(auth)/login'), 100);
           }}
           accessibilityRole="button"
-          accessibilityLabel="Go to login"
+          accessibilityLabel={t('auth.logIn')}
           style={{ marginTop: 24, alignItems: 'center', paddingVertical: 12 }}
         >
           <Text
@@ -347,14 +348,14 @@ export default function RegisterScreen() {
               color: theme.colors.textMuted,
             }}
           >
-            Already have an account?{' '}
+            {t('auth.alreadyHaveAccount')}
             <Text
               style={{
                 fontFamily: theme.font.bodySemiBold,
                 color: theme.colors.primary,
               }}
             >
-              Log in
+              {t('auth.logIn')}
             </Text>
           </Text>
         </Pressable>

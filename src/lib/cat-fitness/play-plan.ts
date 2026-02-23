@@ -6,9 +6,10 @@ import {
   OVERWEIGHT_MODIFIERS,
   OBESE_MODIFIERS,
   SENIOR_MOBILITY_MODIFIERS,
-  STOP_RULES,
-  HUNT_EAT_GROOM_SLEEP,
+  getStopRules,
+  getHuntEatGroomSleep,
 } from './knowledge-base';
+import i18n from '@/src/i18n';
 
 /**
  * Generate a personalized play plan for a cat based on their profile.
@@ -159,9 +160,9 @@ export function generatePlayPlan(profile: CatProfile): PlayPlan {
   }
 
   const intensityDescriptions: Record<string, string> = {
-    low: 'Gentle, ground-level play with slow-moving toys. Ideal for seniors, obese cats, cats with mobility issues, or warm-up/cool-down.',
-    moderate: 'Active play with moderate bursts of running, pouncing, and batting. Good for most adult cats. Not suitable for obese cats without veterinary approval.',
-    high: 'Vigorous play with sprinting, jumping, and intense chase sequences. Best for young, healthy cats at normal weight with high energy.',
+    low: i18n.t('catFitness.intensityLowDesc'),
+    moderate: i18n.t('catFitness.intensityModerateDesc'),
+    high: i18n.t('catFitness.intensityHighDesc'),
   };
 
   const intensityProfile: IntensityProfile = {
@@ -170,10 +171,10 @@ export function generatePlayPlan(profile: CatProfile): PlayPlan {
   };
 
   // Build stop rules — add obesity-specific ones
-  const stopRules = [...STOP_RULES];
+  const stopRules = [...getStopRules()];
   if (obese) {
     stopRules.unshift(
-      'OBESE CAT: Stop after each 3\u20135 minute micro-session even if the cat seems willing to continue. Mandatory rest break of at least 10 minutes. Resume only if breathing is normal and relaxed.'
+      i18n.t('catFitness.obeseStopRule')
     );
   }
 
@@ -187,9 +188,8 @@ export function generatePlayPlan(profile: CatProfile): PlayPlan {
     days_per_week: daysPerWeek,
     progression_plan: progressionPlan,
     stop_rules: stopRules,
-    cooldown_notes:
-      'End each session by gradually slowing toy movement over 1\u20132 minutes. Let the cat make a final "kill" (catch the toy). This prevents frustration and allows heart rate to normalize.',
-    hunt_eat_groom_sleep_sequence: HUNT_EAT_GROOM_SLEEP,
+    cooldown_notes: i18n.t('catFitness.cooldownNotes'),
+    hunt_eat_groom_sleep_sequence: getHuntEatGroomSleep(),
   };
 }
 
@@ -215,17 +215,17 @@ function generateProgressionPlan(
     let notes: string;
     if (week === 1) {
       if (category === 'obese') {
-        notes = 'Start very gently. 2\u20133 minute micro-sessions only. Low intensity. Stop immediately if any panting or heavy breathing occurs. Mandatory 10+ minute rest between sessions.';
+        notes = i18n.t('catFitness.progressWeek1Obese');
       } else if (category === 'overweight') {
-        notes = 'Start gentle. Focus on engagement over exertion. Stop if panting. Rest 5+ minutes between sessions.';
+        notes = i18n.t('catFitness.progressWeek1Overweight');
       } else {
-        notes = 'Introduce short play sessions. Focus on building a routine.';
+        notes = i18n.t('catFitness.progressWeek1Normal');
       }
     } else if (week === totalWeeks) {
-      notes = 'Full target duration. Cat should be comfortable with this level. Continue to monitor for fatigue.';
+      notes = i18n.t('catFitness.progressWeekFinal');
     } else {
       const pctIncrease = category === 'obese' ? '10\u201315%' : '15\u201320%';
-      notes = `Gradually increase session length by ${pctIncrease} from previous week. Monitor for fatigue.`;
+      notes = i18n.t('catFitness.progressWeekMid', { pct: pctIncrease });
     }
 
     weeks.push({

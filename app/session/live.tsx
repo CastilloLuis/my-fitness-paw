@@ -19,6 +19,7 @@ import Animated, {
 import * as Haptics from 'expo-haptics';
 import { router } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useTranslation } from 'react-i18next';
 
 import { useCats } from '@/src/hooks/use-cats';
 import { useCreateSession } from '@/src/hooks/use-sessions';
@@ -82,6 +83,7 @@ function CatPickerSkeleton() {
 
 // --- Recording Dot ---
 function RecordingDot() {
+  const { t } = useTranslation();
   const opacity = useSharedValue(1);
 
   useEffect(() => {
@@ -121,7 +123,7 @@ function RecordingDot() {
           color: theme.colors.danger,
         }}
       >
-        Recording...
+        {t('session.recordingDots')}
       </Text>
     </Animated.View>
   );
@@ -204,6 +206,8 @@ function TimeLimitReached({
   restSuggestion: string | null;
   onDismiss: () => void;
 }) {
+  const { t } = useTranslation();
+
   return (
     <Animated.View
       entering={FadeIn.duration(300)}
@@ -225,7 +229,7 @@ function TimeLimitReached({
           textAlign: 'center',
         }}
       >
-        {'\u26D4'} Time Limit Reached
+        {'\u26D4'} {t('session.timeLimitReached')}
       </Text>
       <Text
         style={{
@@ -235,7 +239,7 @@ function TimeLimitReached({
           textAlign: 'center',
         }}
       >
-        Session auto-paused at {maxMinutes} min to protect your cat.
+        {t('session.sessionAutoPaused', { minutes: maxMinutes })}
       </Text>
       <Text
         style={{
@@ -246,11 +250,10 @@ function TimeLimitReached({
           lineHeight: 18,
         }}
       >
-        {restSuggestion ??
-          `Rest for at least ${restMinutes} minutes before the next session. Watch for panting or heavy breathing \u2014 if present, extend the rest period.`}
+        {restSuggestion ?? t('session.restSuggestionDefault', { minutes: restMinutes })}
       </Text>
       <View style={{ gap: 8, marginTop: 4 }}>
-        <Button title="Stop & Save Session" onPress={onDismiss} />
+        <Button title={t('session.stopAndSave')} onPress={onDismiss} />
       </View>
     </Animated.View>
   );
@@ -324,6 +327,7 @@ function ActivityChip({
 }
 
 export default function LiveSessionScreen() {
+  const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   const { data: cats, isLoading: catsLoading } = useCats();
   const createSession = useCreateSession();
@@ -449,7 +453,7 @@ export default function LiveSessionScreen() {
 
   const handleSave = useCallback(async () => {
     if (!selectedCatId || !selectedActivity) {
-      setError('Please select an activity');
+      setError(t('session.selectActivity'));
       return;
     }
     setError('');
@@ -471,9 +475,9 @@ export default function LiveSessionScreen() {
       liveStore.clear();
       setPhase('success');
     } catch (e: any) {
-      setError(e.message || 'Failed to save session');
+      setError(e.message || t('session.failedToSave'));
     }
-  }, [selectedCatId, selectedActivity, finalElapsedMs, notes, createSession, liveStore]);
+  }, [selectedCatId, selectedActivity, finalElapsedMs, notes, createSession, liveStore, t]);
 
   const handleSuccessComplete = useCallback(() => {
     router.back();
@@ -545,11 +549,11 @@ export default function LiveSessionScreen() {
             }}
           >
             {phase === 'pick-cat'
-              ? 'New Session'
+              ? t('session.newSession')
               : phase === 'recording'
-                ? 'Recording'
+                ? t('session.recording')
                 : phase === 'classify'
-                  ? 'Classify'
+                  ? t('session.classify')
                   : ''}
           </Text>
           {phase !== 'success' && phase !== 'recording' && (
@@ -592,7 +596,7 @@ export default function LiveSessionScreen() {
                     color: theme.colors.text,
                   }}
                 >
-                  Who's playing?
+                  {t('session.whosPlaying')}
                 </Text>
 
                 <CatPicker
@@ -612,9 +616,9 @@ export default function LiveSessionScreen() {
             ) : (
               <EmptyState
                 emoji={'\u{1F431}'}
-                title="No cats yet"
-                message="Add a cat first, then you can start a session!"
-                actionTitle="Add a Cat"
+                title={t('session.noCatsYet')}
+                message={t('session.addCatFirst')}
+                actionTitle={t('home.addACat')}
                 onAction={() => {
                   router.back();
                   setTimeout(() => router.push('/(tabs)/cats'), 100);
@@ -626,7 +630,7 @@ export default function LiveSessionScreen() {
 
             {hasCats && (
               <Button
-                title="Start Session"
+                title={t('session.startSession')}
                 onPress={handleStart}
                 disabled={!selectedCatId}
                 style={{ opacity: selectedCatId ? 1 : 0.5 }}
@@ -727,8 +731,8 @@ export default function LiveSessionScreen() {
                       }}
                     >
                       {Math.ceil((playSafety!.maxContinuousMs - displayMs) / 60000) > 0
-                        ? `${Math.ceil((playSafety!.maxContinuousMs - displayMs) / 60000)} min remaining`
-                        : 'Limit reached'}
+                        ? t('session.minRemaining', { minutes: Math.ceil((playSafety!.maxContinuousMs - displayMs) / 60000) })
+                        : t('session.limitReached')}
                     </Text>
                   </View>
                 )}
@@ -750,13 +754,13 @@ export default function LiveSessionScreen() {
                   style={{ flexDirection: 'row', gap: 16, paddingHorizontal: 24 }}
                 >
                   <Button
-                    title={liveStore.isPaused ? 'Resume' : 'Pause'}
+                    title={liveStore.isPaused ? t('session.resume') : t('session.pause')}
                     onPress={handlePauseResume}
                     variant="secondary"
                     style={{ flex: 1 }}
                   />
                   <Button
-                    title="Stop"
+                    title={t('session.stop')}
                     onPress={handleStop}
                     style={{ flex: 1, backgroundColor: theme.colors.danger }}
                   />
@@ -799,7 +803,7 @@ export default function LiveSessionScreen() {
             {/* Rest suggestion after session for overweight/obese */}
             {playSafety?.safety.restSuggestion && (
               <SafetyBanner
-                message={`Rest suggestion: ${playSafety.safety.restSuggestion}`}
+                message={t('session.restSuggestionLabel', { suggestion: playSafety.safety.restSuggestion })}
                 variant={playSafety.obesityStatus === 'obese' ? 'danger' : 'warning'}
               />
             )}
@@ -811,7 +815,7 @@ export default function LiveSessionScreen() {
                 color: theme.colors.text,
               }}
             >
-              What type of play?
+              {t('session.whatTypeOfPlay')}
             </Text>
 
             <View
@@ -820,7 +824,7 @@ export default function LiveSessionScreen() {
               {ACTIVITY_TYPES.map((activity) => (
                 <ActivityChip
                   key={activity.id}
-                  label={activity.label}
+                  label={t(activity.label)}
                   emoji={activity.emoji}
                   color={activity.color}
                   selected={selectedActivity === activity.id}
@@ -836,12 +840,12 @@ export default function LiveSessionScreen() {
                 color: theme.colors.text,
               }}
             >
-              Notes (optional)
+              {t('session.notesOptional')}
             </Text>
             <TextInput
               value={notes}
               onChangeText={setNotes}
-              placeholder="How did it go?"
+              placeholder={t('session.notesPlaceholder')}
               placeholderTextColor={theme.colors.textMuted}
               multiline
               numberOfLines={3}
@@ -885,7 +889,7 @@ export default function LiveSessionScreen() {
             )}
 
             <Button
-              title="Save Session"
+              title={t('session.saveSession')}
               onPress={handleSave}
               loading={createSession.isPending}
             />

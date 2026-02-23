@@ -4,6 +4,7 @@ import React, { useMemo, useState } from 'react';
 import { Linking, Pressable, ScrollView, Text, View } from 'react-native';
 import Animated, { FadeInDown, FadeOut } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useTranslation } from 'react-i18next';
 
 import { Ionicons } from '@expo/vector-icons';
 
@@ -27,15 +28,16 @@ import { theme } from '@/src/theme';
 
 const DAILY_GOAL = 30;
 
-function getGreeting(): string {
+function getGreeting(t: (key: string) => string): string {
   const hour = new Date().getHours();
-  if (hour < 12) return 'Good morning';
-  if (hour < 17) return 'Good afternoon';
-  return 'Good evening';
+  if (hour < 12) return t('home.goodMorning');
+  if (hour < 17) return t('home.goodAfternoon');
+  return t('home.goodEvening');
 }
 
 export default function HomeScreen() {
   const insets = useSafeAreaInsets();
+  const { t } = useTranslation();
   const { data: profile } = useProfile();
   const { data: cats, isLoading: catsLoading } = useCats();
   const { data: todaySessions, isLoading: sessionsLoading } = useTodaySessions();
@@ -114,7 +116,7 @@ export default function HomeScreen() {
                     color: theme.colors.text,
                   }}
                 >
-                  {getGreeting()}!
+                  {getGreeting(t)}!
                 </Text>
                 <Image
                   source={require('@/assets/icons/two-paws.png')}
@@ -183,7 +185,7 @@ export default function HomeScreen() {
                     color: theme.colors.text,
                   }}
                 >
-                  Notifications are off
+                  {t('home.notificationsOff')}
                 </Text>
                 <Text
                   style={{
@@ -193,7 +195,7 @@ export default function HomeScreen() {
                     marginTop: 2,
                   }}
                 >
-                  Enable them to get daily play reminders for your cats.
+                  {t('home.enableNotificationsMessage')}
                 </Text>
               </View>
               <View style={{ gap: 8, alignItems: 'center' }}>
@@ -223,7 +225,7 @@ export default function HomeScreen() {
                       color: theme.colors.onPrimary,
                     }}
                   >
-                    Enable
+                    {t('common.enable')}
                   </Text>
                 </Pressable>
                 <Pressable
@@ -250,7 +252,7 @@ export default function HomeScreen() {
                   color: theme.colors.textMuted,
                 }}
               >
-                Today's Activity
+                {t('home.todaysActivity')}
               </Text>
               {isLoading ? (
                 <Skeleton width={110} height={110} borderRadius={55} />
@@ -260,7 +262,7 @@ export default function HomeScreen() {
                   size={110}
                   strokeWidth={9}
                   label={`${totalMinutesToday}`}
-                  sublabel={`of ${DAILY_GOAL} min`}
+                  sublabel={t('home.ofGoal', { goal: DAILY_GOAL })}
                 />
               )}
               {streak > 0 && (
@@ -271,7 +273,7 @@ export default function HomeScreen() {
                     color: theme.colors.ginger700,
                   }}
                 >
-                  {'\u{1F525}'} {streak} day streak!
+                  {'\u{1F525}'} {t('home.dayStreak', { count: streak })}
                 </Text>
               )}
             </View>
@@ -289,7 +291,7 @@ export default function HomeScreen() {
                 marginBottom: 8,
               }}
             >
-              Insights
+              {t('home.insights')}
             </Text>
             <ScrollView
               horizontal
@@ -325,7 +327,7 @@ export default function HomeScreen() {
                 color: theme.colors.text,
               }}
             >
-              My Cats
+              {t('home.myCats')}
             </Text>
             <Pressable
               onPress={() => router.push('/(tabs)/cats')}
@@ -339,7 +341,7 @@ export default function HomeScreen() {
                   color: theme.colors.primary,
                 }}
               >
-                See all
+                {t('home.seeAll')}
               </Text>
             </Pressable>
           </View>
@@ -382,10 +384,10 @@ export default function HomeScreen() {
                   paddingVertical: 16,
                 }}
               >
-                No cats yet — add your first furry friend! {'\u{1F431}'}
+                {t('home.noCatsEmpty')} {'\u{1F431}'}
               </Text>
               <Button
-                title="Add a Cat"
+                title={t('home.addACat')}
                 onPress={() => router.push('/(tabs)/cats')}
                 variant="secondary"
               />
@@ -410,7 +412,7 @@ export default function HomeScreen() {
                 color: theme.colors.text,
               }}
             >
-              Today's Sessions
+              {t('home.todaysSessions')}
             </Text>
             <Pressable
               onPress={() => router.push('/session/manual')}
@@ -435,7 +437,7 @@ export default function HomeScreen() {
                   color: theme.colors.onPrimary,
                 }}
               >
-                Add
+                {t('common.add')}
               </Text>
             </Pressable>
           </View>
@@ -480,7 +482,7 @@ export default function HomeScreen() {
                   color: theme.colors.primary,
                 }}
               >
-                Start a session
+                {t('home.startASession')}
               </Text>
               <Text
                 style={{
@@ -490,7 +492,7 @@ export default function HomeScreen() {
                   textAlign: 'center',
                 }}
               >
-                Time to play! Tap the paw to begin.
+                {t('home.timeToPlay')}
               </Text>
             </Pressable>
           )}

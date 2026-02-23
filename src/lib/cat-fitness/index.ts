@@ -66,7 +66,8 @@ import { recommendToys } from './toy-recommender';
 import { calculateDailyCalories, calculateWeeklyCalories } from './calories';
 import { isOverweight, isObese, isUnderweight } from './life-stage';
 import { classifyObesityStatus } from './energy';
-import { DISCLAIMER } from './knowledge-base';
+import { getDisclaimer } from './knowledge-base';
+import i18n from '@/src/i18n';
 
 /**
  * Generate complete insights for a cat.
@@ -93,56 +94,36 @@ export function generateCatInsights(
   const obesityStatus = classifyObesityStatus(profile);
 
   if (obesityStatus === 'obese') {
-    warnings.push(
-      'This cat is classified as obese (BCS 8\u20139). Obesity places significant strain on the heart, lungs, and joints. Play sessions have been limited to short, low-intensity micro-sessions with mandatory rest breaks. Consult your veterinarian before starting any exercise program.'
-    );
-    warnings.push(
-      'IMPORTANT: Obese cats are at increased risk of respiratory distress during exertion. Stop immediately if open-mouth breathing, panting, or reluctance to continue is observed. Allow at least 10 minutes of rest between sessions.'
-    );
+    warnings.push(i18n.t('catFitness.warningObese1'));
+    warnings.push(i18n.t('catFitness.warningObese2'));
   } else if (obesityStatus === 'overweight') {
-    warnings.push(
-      'This cat appears to be overweight (BCS 7). The play plan has been adjusted with shorter, more frequent sessions and capped intensity. Consult your veterinarian before starting a weight-loss exercise program.'
-    );
+    warnings.push(i18n.t('catFitness.warningOverweight'));
   } else if (obesityStatus === 'unknown' && profile.weight_kg > 5.5) {
-    warnings.push(
-      'This cat\'s weight (' + profile.weight_kg + ' kg) may indicate overweight status depending on breed and frame. A Body Condition Score (BCS) assessment by your veterinarian is recommended for accurate classification.'
-    );
+    warnings.push(i18n.t('catFitness.warningUnknownWeight', { weight: profile.weight_kg }));
   }
 
   if (isUnderweight(profile)) {
-    warnings.push(
-      'This cat may be underweight. Ensure adequate caloric intake before increasing exercise. Consult your veterinarian.'
-    );
+    warnings.push(i18n.t('catFitness.warningUnderweight'));
   }
 
   if (profile.known_cardiac_or_resp_disease) {
-    warnings.push(
-      'KNOWN CARDIAC OR RESPIRATORY DISEASE: Only very gentle, supervised play is appropriate. Stop at the first sign of labored breathing, coughing, or fatigue. Your veterinarian should approve any exercise program.'
-    );
+    warnings.push(i18n.t('catFitness.warningCardiac'));
   }
 
   if (profile.mobility_limitations) {
-    warnings.push(
-      'Mobility limitations detected. Plan adjusted to low-impact activities only. Avoid jumping and climbing activities.'
-    );
+    warnings.push(i18n.t('catFitness.warningMobility'));
   }
 
   if (profile.is_anxious) {
-    warnings.push(
-      'Anxious cat profile. Sessions are kept shorter to prevent overstimulation. Avoid laser pointers and unpredictable automated toys.'
-    );
+    warnings.push(i18n.t('catFitness.warningAnxious'));
   }
 
   if (profile.ambient_hot) {
-    warnings.push(
-      'Hot ambient temperature: cats dissipate heat poorly. Session lengths have been reduced. Ensure fresh water is available. Stop play if any panting occurs.'
-    );
+    warnings.push(i18n.t('catFitness.warningHot'));
   }
 
   if (profile.age_months > 180) {
-    warnings.push(
-      'This is a geriatric cat (15+ years). Increased veterinary monitoring recommended. Watch closely for signs of pain or fatigue during play.'
-    );
+    warnings.push(i18n.t('catFitness.warningGeriatric'));
   }
 
   return {
@@ -152,6 +133,6 @@ export function generateCatInsights(
     today_calories: todayCalories,
     weekly_calories: weeklyCalories,
     warnings,
-    disclaimer: DISCLAIMER,
+    disclaimer: getDisclaimer(),
   };
 }

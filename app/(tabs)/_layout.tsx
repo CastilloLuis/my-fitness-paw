@@ -1,9 +1,12 @@
 import React from 'react';
 import { Tabs } from 'expo-router';
+import { useTranslation } from 'react-i18next';
 import { TabBar } from '@/src/components/layout/tab-bar';
 import { theme } from '@/src/theme';
 
 export default function TabLayout() {
+  const { t } = useTranslation();
+
   return (
     <Tabs
       tabBar={(props) => <TabBar {...props} />}
@@ -12,9 +15,9 @@ export default function TabLayout() {
         tabBarStyle: { display: 'none' },
       }}
     >
-      <Tabs.Screen name="index" options={{ title: 'Home' }} />
-      <Tabs.Screen name="cats" options={{ title: 'Cats' }} />
-      <Tabs.Screen name="insights" options={{ title: 'Insights' }} />
+      <Tabs.Screen name="index" options={{ title: t('tabs.home') }} />
+      <Tabs.Screen name="cats" options={{ title: t('tabs.myCats') }} />
+      <Tabs.Screen name="insights" options={{ title: t('tabs.insights') }} />
     </Tabs>
   );
 }

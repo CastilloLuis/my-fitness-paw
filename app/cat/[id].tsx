@@ -4,6 +4,7 @@ import { Modal, Pressable, ScrollView, Text, View } from 'react-native';
 import Animated, { FadeInDown, FadeInRight } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 
 import { useCats } from '@/src/hooks/use-cats';
 import { useSessionsByCat } from '@/src/hooks/use-sessions';
@@ -65,11 +66,11 @@ function groupSessionsByDay(
   return Array.from(dayMap.values());
 }
 
-const LIFE_STAGE_LABELS: Record<string, { label: string; emoji: string }> = {
-  kitten: { label: 'Kitten', emoji: '\u{1F431}' },
-  young_adult: { label: 'Young Adult', emoji: '\u{1F408}' },
-  mature_adult: { label: 'Mature Adult', emoji: '\u{1F408}\u200D\u2B1B' },
-  senior: { label: 'Senior', emoji: '\u{1F9D3}' },
+const LIFE_STAGE_KEYS: Record<string, { key: string; emoji: string }> = {
+  kitten: { key: 'catProfile.kitten', emoji: '\u{1F431}' },
+  young_adult: { key: 'catProfile.youngAdult', emoji: '\u{1F408}' },
+  mature_adult: { key: 'catProfile.matureAdult', emoji: '\u{1F408}\u200D\u2B1B' },
+  senior: { key: 'catProfile.senior', emoji: '\u{1F9D3}' },
 };
 
 const INTENSITY_COLORS: Record<string, string> = {
@@ -234,6 +235,7 @@ function StopRuleItem({ rule, index }: { rule: string; index: number }) {
 // --- Main Screen ---
 
 export default function CatProfileScreen() {
+  const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   const { id } = useLocalSearchParams<{ id: string }>();
   const { data: cats, isLoading: catsLoading } = useCats();
@@ -278,7 +280,7 @@ export default function CatProfileScreen() {
     return (
       <View style={{ flex: 1, backgroundColor: theme.colors.bg, alignItems: 'center', justifyContent: 'center' }}>
         <Text style={{ fontFamily: theme.font.body, fontSize: 16, color: theme.colors.textMuted }}>
-          Cat not found
+          {t('catProfile.catNotFound')}
         </Text>
       </View>
     );
@@ -286,7 +288,7 @@ export default function CatProfileScreen() {
 
   const { play_plan, toy_recommendations, today_calories, weekly_calories, warnings } = insights;
   const rer = estimateRER(cat.weight_kg ?? 4.5);
-  const lifeStageInfo = LIFE_STAGE_LABELS[play_plan.life_stage] ?? { label: play_plan.life_stage, emoji: '\u{1F431}' };
+  const lifeStageInfo = LIFE_STAGE_KEYS[play_plan.life_stage] ?? { key: play_plan.life_stage, emoji: '\u{1F431}' };
 
   const topToys = toy_recommendations.slice(0, 5);
 
@@ -347,7 +349,7 @@ export default function CatProfileScreen() {
 
             <View style={{ flexDirection: 'row', gap: 8, flexWrap: 'wrap', justifyContent: 'center' }}>
               <Badge
-                label={`${lifeStageInfo.emoji} ${lifeStageInfo.label}`}
+                label={`${lifeStageInfo.emoji} ${t(lifeStageInfo.key)}`}
                 color={theme.colors.ginger400 + '25'}
                 textColor={theme.colors.ginger700}
               />
@@ -367,7 +369,7 @@ export default function CatProfileScreen() {
               )}
               {streak > 0 && (
                 <Badge
-                  label={`${streak} day streak`}
+                  label={t('catProfile.dayStreak', { count: streak })}
                   icon={'\u{1F525}'}
                   color={theme.colors.ginger400 + '30'}
                   textColor={theme.colors.ginger700}
@@ -395,7 +397,7 @@ export default function CatProfileScreen() {
                   color: theme.colors.primary,
                 }}
               >
-                Edit
+                {t('common.edit')}
               </Text>
             </Pressable>
           </Card>
@@ -412,7 +414,7 @@ export default function CatProfileScreen() {
 
         {/* Progress */}
         <View style={{ paddingHorizontal: theme.spacing.md }}>
-          <SectionHeader title="Progress" emoji={'\u{1F3AF}'} delay={100} />
+          <SectionHeader title={t('catProfile.progress')} emoji={'\u{1F3AF}'} delay={100} />
           <WeeklyRings
             sessions={allSessions ?? []}
             targetMinutes={play_plan.total_minutes_per_day_range.max}
@@ -422,32 +424,32 @@ export default function CatProfileScreen() {
 
         {/* Play Plan */}
         <View style={{ paddingHorizontal: theme.spacing.md }}>
-          <SectionHeader title="Play Plan" emoji={'\u{1F3C3}'} delay={200} />
+          <SectionHeader title={t('catProfile.playPlan')} emoji={'\u{1F3C3}'} delay={200} />
           <Animated.View entering={FadeInDown.delay(250).duration(400)}>
             <Card elevated>
               <StatRow
                 icon={'\u{1F504}'}
-                label="Sessions / day"
+                label={t('catProfile.sessionsPerDay')}
                 value={rangeStr(play_plan.sessions_per_day_range)}
               />
               <StatRow
                 icon={'\u23F1\uFE0F'}
-                label="Minutes / session"
+                label={t('catProfile.minutesPerSession')}
                 value={rangeStr(play_plan.minutes_per_session_range)}
               />
               <StatRow
                 icon={'\u{1F4CA}'}
-                label="Total daily minutes"
+                label={t('catProfile.totalDailyMinutes')}
                 value={rangeStr(play_plan.total_minutes_per_day_range)}
               />
               <StatRow
                 icon={'\u{1F4AA}'}
-                label="Intensity"
+                label={t('catProfile.intensity')}
                 value={play_plan.intensity_profile.level.charAt(0).toUpperCase() + play_plan.intensity_profile.level.slice(1)}
               />
               <StatRow
                 icon={'\u{1F4C5}'}
-                label="Days / week"
+                label={t('catProfile.daysPerWeek')}
                 value={play_plan.days_per_week}
               />
               <View style={{ marginTop: 12 }}>
@@ -469,24 +471,24 @@ export default function CatProfileScreen() {
 
         {/* Calorie Insights */}
         <View style={{ paddingHorizontal: theme.spacing.md }}>
-          <SectionHeader title="Calorie Insights" emoji={'\u{1F525}'} delay={300} />
+          <SectionHeader title={t('catProfile.calorieInsights')} emoji={'\u{1F525}'} delay={300} />
           <Animated.View entering={FadeInDown.delay(350).duration(400)}>
             <Card elevated>
               <StatRow
                 icon={'\u{2764}\uFE0F'}
-                label="Resting Energy (RER)"
+                label={t('catProfile.restingEnergy')}
                 value={`${rer} kcal/day`}
               />
               {today_calories && (
                 <>
                   <StatRow
                     icon={'\u{1F3C3}'}
-                    label="Today's play burn"
+                    label={t('catProfile.todaysPlayBurn')}
                     value={`${today_calories.total_estimated_kcal.min}–${today_calories.total_estimated_kcal.max} kcal`}
                   />
                   <StatRow
                     icon={'\u{1F4CA}'}
-                    label="% of RER from play"
+                    label={t('catProfile.rerFromPlay')}
                     value={`${playCaloriesAsPercentOfRER(today_calories.total_estimated_kcal, cat.weight_kg ?? 4.5).min}–${playCaloriesAsPercentOfRER(today_calories.total_estimated_kcal, cat.weight_kg ?? 4.5).max}%`}
                   />
                 </>
@@ -495,18 +497,18 @@ export default function CatProfileScreen() {
                 <>
                   <StatRow
                     icon={'\u{1F4C6}'}
-                    label="Weekly total"
+                    label={t('catProfile.weeklyTotal')}
                     value={`${weekly_calories.total_estimated_kcal.min}–${weekly_calories.total_estimated_kcal.max} kcal`}
                   />
                   <StatRow
                     icon={'\u{1F4C8}'}
-                    label="Daily average"
+                    label={t('catProfile.dailyAverage')}
                     value={`${weekly_calories.daily_average_kcal.min}–${weekly_calories.daily_average_kcal.max} kcal`}
                   />
                   <StatRow
                     icon={'\u2705'}
-                    label="Active days"
-                    value={`${weekly_calories.active_days} / 7`}
+                    label={t('catProfile.activeDays')}
+                    value={t('catProfile.activeDaysValue', { active: weekly_calories.active_days })}
                   />
                 </>
               )}
@@ -520,7 +522,7 @@ export default function CatProfileScreen() {
                     paddingVertical: 16,
                   }}
                 >
-                  Log some play sessions to see calorie estimates!
+                  {t('catProfile.noCalorieData')}
                 </Text>
               )}
             </Card>
@@ -530,7 +532,7 @@ export default function CatProfileScreen() {
         {/* Toy Recommendations */}
         <View>
           <View style={{ paddingHorizontal: theme.spacing.md }}>
-            <SectionHeader title="Toy Recommendations" emoji={'\u{1FA84}'} delay={400} />
+            <SectionHeader title={t('catProfile.toyRecommendations')} emoji={'\u{1FA84}'} delay={400} />
           </View>
           <ScrollView
             horizontal
@@ -549,7 +551,7 @@ export default function CatProfileScreen() {
         {/* Progression Plan */}
         {play_plan.progression_plan && play_plan.progression_plan.length > 0 && (
           <View style={{ paddingHorizontal: theme.spacing.md }}>
-            <SectionHeader title="Progression Plan" emoji={'\u{1F4C8}'} delay={450} />
+            <SectionHeader title={t('catProfile.progressionPlan')} emoji={'\u{1F4C8}'} delay={450} />
             {play_plan.progression_plan.map((week, i) => (
               <Animated.View key={week.week} entering={FadeInDown.delay(480 + i * 60).duration(400)}>
                 <Card
@@ -567,7 +569,7 @@ export default function CatProfileScreen() {
                         color: theme.colors.text,
                       }}
                     >
-                      Week {week.week}
+                      {t('catProfile.week', { number: week.week })}
                     </Text>
                     <Badge
                       label={`${week.sessions_per_day}x/day - ${rangeStr(week.minutes_per_session)} min`}
@@ -594,7 +596,7 @@ export default function CatProfileScreen() {
 
         {/* Cooldown Notes */}
         <View style={{ paddingHorizontal: theme.spacing.md }}>
-          <SectionHeader title="Cooldown" emoji={'\u{1F4A8}'} delay={500} />
+          <SectionHeader title={t('catProfile.cooldown')} emoji={'\u{1F4A8}'} delay={500} />
           <Animated.View entering={FadeInDown.delay(530).duration(400)}>
             <Card>
               <Text
@@ -613,7 +615,7 @@ export default function CatProfileScreen() {
 
         {/* Hunt-Eat-Groom-Sleep */}
         <View style={{ paddingHorizontal: theme.spacing.md }}>
-          <SectionHeader title="Natural Cycle" emoji={'\u{1F3AF}'} delay={550} />
+          <SectionHeader title={t('catProfile.naturalCycle')} emoji={'\u{1F3AF}'} delay={550} />
           <Animated.View entering={FadeInDown.delay(580).duration(400)}>
             <Card
               style={{
@@ -638,7 +640,7 @@ export default function CatProfileScreen() {
 
         {/* Stop Rules */}
         <View style={{ paddingHorizontal: theme.spacing.md }}>
-          <SectionHeader title="When to Stop" emoji={'\u26A0\uFE0F'} delay={600} />
+          <SectionHeader title={t('catProfile.whenToStop')} emoji={'\u26A0\uFE0F'} delay={600} />
           <Animated.View entering={FadeInDown.delay(630).duration(400)}>
             <Card>
               {play_plan.stop_rules.map((rule, i) => (

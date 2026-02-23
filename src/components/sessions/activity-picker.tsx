@@ -6,6 +6,7 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 import * as Haptics from 'expo-haptics';
+import { useTranslation } from 'react-i18next';
 import { ACTIVITY_TYPES } from '@/src/utils/activity-types';
 import { theme } from '@/src/theme';
 
@@ -83,12 +84,14 @@ function ActivityChip({
 }
 
 export function ActivityPicker({ selectedId, onSelect }: ActivityPickerProps) {
+  const { t } = useTranslation();
+
   return (
     <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
       {ACTIVITY_TYPES.map((activity) => (
         <ActivityChip
           key={activity.id}
-          label={activity.label}
+          label={t(activity.label)}
           emoji={activity.emoji}
           color={activity.color}
           selected={activity.id === selectedId}

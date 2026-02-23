@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import i18n from '@/src/i18n';
 import { buildSafetyConstraints, classifyObesityStatus } from '@/src/lib/cat-fitness/energy';
 import { yearsToMonths } from '@/src/lib/cat-fitness/life-stage';
 import type { SafetyConstraints, ObesityStatus, CatProfile } from '@/src/lib/cat-fitness/types';
@@ -40,9 +41,9 @@ export function usePlaySafety(cat: Cat | null | undefined): PlaySafety | null {
 
     let timerWarning: string | null = null;
     if (obesityStatus === 'obese') {
-      timerWarning = `Obese cat \u2014 max ${safety.maxContinuousMinutes.min}\u2013${safety.maxContinuousMinutes.max} min per session. Timer will auto-pause at ${safety.maxContinuousMinutes.max} min.`;
+      timerWarning = i18n.t('catFitness.obeseTimerWarning', { min: safety.maxContinuousMinutes.min, max: safety.maxContinuousMinutes.max });
     } else if (obesityStatus === 'overweight') {
-      timerWarning = `Overweight cat \u2014 max ${safety.maxContinuousMinutes.min}\u2013${safety.maxContinuousMinutes.max} min per session. Timer will auto-pause at ${safety.maxContinuousMinutes.max} min.`;
+      timerWarning = i18n.t('catFitness.overweightTimerWarning', { min: safety.maxContinuousMinutes.min, max: safety.maxContinuousMinutes.max });
     }
 
     return { obesityStatus, safety, maxContinuousMs, hasLimits, timerWarning };

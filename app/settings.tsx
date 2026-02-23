@@ -15,6 +15,7 @@ import { useQueryClient, useMutation } from '@tanstack/react-query';
 import { Ionicons } from '@expo/vector-icons';
 import Constants from 'expo-constants';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useTranslation } from 'react-i18next';
 
 import { useAuth } from '@/src/hooks/use-auth';
 import { useProfile } from '@/src/hooks/use-profile';
@@ -23,6 +24,7 @@ import { signOut, deleteAccount } from '@/src/supabase/auth';
 import { queryKeys } from '@/src/constants/query-keys';
 import { sendTestNotification } from '@/src/utils/notifications';
 import { useNotificationPermission } from '@/src/hooks/use-notification-permission';
+import { useLanguageStore } from '@/src/stores/language-store';
 import { theme } from '@/src/theme';
 
 function SectionHeader({ title }: { title: string }) {
@@ -136,6 +138,8 @@ export default function SettingsScreen() {
   const queryClient = useQueryClient();
   const { user, userId } = useAuth();
   const { data: profile } = useProfile();
+  const { t } = useTranslation();
+  const { language, setLanguage } = useLanguageStore();
 
   const [editingName, setEditingName] = useState(false);
   const [nameValue, setNameValue] = useState('');
@@ -162,10 +166,10 @@ export default function SettingsScreen() {
   };
 
   const handleLogOut = () => {
-    Alert.alert('Log Out', 'Are you sure you want to log out?', [
-      { text: 'Cancel', style: 'cancel' },
+    Alert.alert(t('settings.logOut'), t('settings.logOutConfirm'), [
+      { text: t('common.cancel'), style: 'cancel' },
       {
-        text: 'Log Out',
+        text: t('settings.logOut'),
         style: 'destructive',
         onPress: async () => {
           setLoggingOut(true);
@@ -174,7 +178,7 @@ export default function SettingsScreen() {
             queryClient.clear();
           } catch {
             setLoggingOut(false);
-            Alert.alert('Error', 'Failed to log out. Please try again.');
+            Alert.alert(t('common.error'), t('settings.failedLogOut'));
           }
         },
       },
@@ -183,21 +187,21 @@ export default function SettingsScreen() {
 
   const handleDeleteAccount = () => {
     Alert.alert(
-      'Delete Account?',
-      'All your data including cats and play sessions will be permanently deleted.',
+      t('settings.deleteAccountConfirm'),
+      t('settings.deleteAccountMessage'),
       [
-        { text: 'Cancel', style: 'cancel' },
+        { text: t('common.cancel'), style: 'cancel' },
         {
-          text: 'Continue',
+          text: t('common.continue'),
           style: 'destructive',
           onPress: () => {
             Alert.alert(
-              'Are you sure?',
-              'This cannot be undone.',
+              t('settings.areYouSure'),
+              t('settings.cannotBeUndone'),
               [
-                { text: 'Cancel', style: 'cancel' },
+                { text: t('common.cancel'), style: 'cancel' },
                 {
-                  text: 'Delete My Account',
+                  text: t('settings.deleteMyAccount'),
                   style: 'destructive',
                   onPress: async () => {
                     setDeleting(true);
@@ -207,7 +211,7 @@ export default function SettingsScreen() {
                       queryClient.clear();
                     } catch {
                       setDeleting(false);
-                      Alert.alert('Error', 'Failed to delete account. Please try again.');
+                      Alert.alert(t('common.error'), t('settings.failedDelete'));
                     }
                   },
                 },
@@ -221,13 +225,13 @@ export default function SettingsScreen() {
 
   const handleResetOnboarding = async () => {
     await AsyncStorage.removeItem('@myfitnesspaw:onboarding_done');
-    Alert.alert('Done', 'Onboarding reset. Restart the app to see it.');
+    Alert.alert(t('common.done'), t('settings.onboardingReset'));
   };
 
   const { enabled: notificationsEnabled } = useNotificationPermission();
   const isDev = process.env.EXPO_PUBLIC_IS_DEV === 'true';
   const appVersion = Constants.expoConfig?.version ?? '1.0.0';
-  const displayName = profile?.display_name || 'Set your name';
+  const displayName = profile?.display_name || t('settings.setYourName');
 
   return (
     <View style={{ flex: 1, backgroundColor: theme.colors.bg }}>
@@ -271,12 +275,12 @@ export default function SettingsScreen() {
               color: theme.colors.text,
             }}
           >
-            Settings
+            {t('settings.title')}
           </Text>
         </View>
 
         {/* Profile card */}
-        <SectionHeader title="Profile" />
+        <SectionHeader title={t('settings.profile')} />
         <SettingsCard>
           {/* Avatar + name + email */}
           <View style={{ alignItems: 'center', paddingVertical: 20, gap: 10 }}>
@@ -370,46 +374,71 @@ export default function SettingsScreen() {
         </SettingsCard>
 
         {/* Notifications section */}
-        <SectionHeader title="Notifications" />
+        <SectionHeader title={t('settings.notifications')} />
         <SettingsCard>
           {notificationsEnabled === false ? (
             <SettingsRow
               icon="notifications-off-outline"
-              label="Enable Notifications"
+              label={t('settings.enableNotifications')}
               onPress={() => Linking.openSettings()}
             />
           ) : (
             <SettingsRow
               icon="notifications-outline"
-              label="Notifications"
-              value="Enabled"
+              label={t('settings.notifications')}
+              value={t('settings.enabled')}
             />
           )}
         </SettingsCard>
 
+        {/* Language section */}
+        <SectionHeader title={t('settings.language')} />
+        <SettingsCard>
+          <SettingsRow
+            icon="language-outline"
+            label={t('settings.english')}
+            onPress={() => setLanguage('en')}
+            value={language === 'en' ? '✓' : undefined}
+          />
+          <Divider />
+          <SettingsRow
+            icon="language-outline"
+            label={t('settings.spanish')}
+            onPress={() => setLanguage('es')}
+            value={language === 'es' ? '✓' : undefined}
+          />
+          <Divider />
+          <SettingsRow
+            icon="phone-portrait-outline"
+            label={t('settings.deviceDefault')}
+            onPress={() => setLanguage(null)}
+            value={language === null ? '✓' : undefined}
+          />
+        </SettingsCard>
+
         {/* Account section */}
-        <SectionHeader title="Account" />
+        <SectionHeader title={t('settings.account')} />
         <SettingsCard>
           <SettingsRow
             icon="log-out-outline"
-            label={loggingOut ? 'Logging out...' : 'Log Out'}
+            label={loggingOut ? t('settings.loggingOut') : t('settings.logOut')}
             onPress={loggingOut ? undefined : handleLogOut}
           />
           <Divider />
           <SettingsRow
             icon="trash-outline"
-            label={deleting ? 'Deleting...' : 'Delete Account'}
+            label={deleting ? t('settings.deleting') : t('settings.deleteAccount')}
             onPress={deleting ? undefined : handleDeleteAccount}
             destructive
           />
         </SettingsCard>
 
         {/* About section */}
-        <SectionHeader title="About" />
+        <SectionHeader title={t('settings.about')} />
         <SettingsCard>
           <SettingsRow
             icon="information-circle-outline"
-            label="Version"
+            label={t('settings.version')}
             value={appVersion}
           />
           <Divider />
@@ -422,8 +451,7 @@ export default function SettingsScreen() {
                 lineHeight: 19,
               }}
             >
-              MyFitnessPaw helps you track your cat's play and exercise.
-              Not a substitute for veterinary advice.
+              {t('settings.aboutDescription')}
             </Text>
           </View>
         </SettingsCard>
@@ -431,17 +459,17 @@ export default function SettingsScreen() {
         {/* Dev tools — only visible when EXPO_PUBLIC_IS_DEV=true */}
         {isDev && (
           <>
-            <SectionHeader title="Developer" />
+            <SectionHeader title={t('settings.developer')} />
             <SettingsCard>
               <SettingsRow
                 icon="refresh-outline"
-                label="Reset Onboarding"
+                label={t('settings.resetOnboarding')}
                 onPress={handleResetOnboarding}
               />
               <Divider />
               <SettingsRow
                 icon="notifications-outline"
-                label="Send Test Notification"
+                label={t('settings.sendTestNotification')}
                 onPress={() => sendTestNotification()}
               />
             </SettingsCard>

@@ -6,6 +6,7 @@ import type { ImageSource } from 'expo-image';
 import { Image } from 'expo-image';
 import { router } from 'expo-router';
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Pressable, Text, View } from 'react-native';
 import Animated, {
   Easing,
@@ -23,10 +24,10 @@ const TAB_ICONS: Record<string, ImageSource> = {
   insights: require('@/assets/icons/stats.png'),
 };
 
-const TAB_LABELS: Record<string, string> = {
-  index: 'Home',
-  cats: 'My Cats',
-  insights: 'Insights',
+const TAB_LABEL_KEYS: Record<string, string> = {
+  index: 'tabs.home',
+  cats: 'tabs.myCats',
+  insights: 'tabs.insights',
 };
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
@@ -40,6 +41,7 @@ function TabItem({
   isFocused: boolean;
   onPress: () => void;
 }) {
+  const { t } = useTranslation();
   const scale = useSharedValue(1);
   const iconScale = useSharedValue(isFocused ? 1.15 : 1);
   const iconTranslateY = useSharedValue(isFocused ? -2 : 0);
@@ -60,6 +62,8 @@ function TabItem({
     ],
   }));
 
+  const label = t(TAB_LABEL_KEYS[routeName]) || routeName;
+
   return (
     <AnimatedPressable
       onPress={() => {
@@ -75,7 +79,7 @@ function TabItem({
         scale.value = withTiming(1, { duration: 150 });
       }}
       accessibilityRole="tab"
-      accessibilityLabel={TAB_LABELS[routeName] || routeName}
+      accessibilityLabel={label}
       accessibilityState={{ selected: isFocused }}
       style={[
         {
@@ -120,7 +124,7 @@ function TabItem({
           color: isFocused ? theme.colors.primary : theme.colors.textMuted,
         }}
       >
-        {TAB_LABELS[routeName] || routeName}
+        {label}
       </Text>
     </AnimatedPressable>
   );
@@ -136,6 +140,7 @@ function formatCompact(ms: number): string {
 }
 
 function PlayButton() {
+  const { t } = useTranslation();
   const scale = useSharedValue(1);
   const shimmer = useSharedValue(0);
   const isRecording = useLiveSessionStore((s) => s.isRecording);
@@ -316,7 +321,7 @@ function PlayButton() {
               color: theme.colors.ivory50,
             }}
           >
-            Record
+            {t('tabs.record')}
           </Text>
         </>
       )}

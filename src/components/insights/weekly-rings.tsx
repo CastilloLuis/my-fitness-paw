@@ -2,13 +2,14 @@ import React from 'react';
 import { View, Text } from 'react-native';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import { startOfWeek, addDays } from 'date-fns';
+import { useTranslation } from 'react-i18next';
 
 import { Card } from '@/src/components/ui/card';
 import { ProgressRing } from '@/src/components/ui/progress-ring';
 import type { PlaySession } from '@/src/supabase/types';
 import { theme } from '@/src/theme';
 
-const DAY_LABELS = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
+const DAY_LABEL_KEYS = ['weekly.dayMonShort', 'weekly.dayTueShort', 'weekly.dayWedShort', 'weekly.dayThuShort', 'weekly.dayFriShort', 'weekly.daySatShort', 'weekly.daySunShort'];
 const RING_SIZE = 44;
 const RING_STROKE = 5;
 
@@ -19,13 +20,14 @@ interface WeeklyRingsProps {
 }
 
 export function WeeklyRings({ sessions, targetMinutes, streak }: WeeklyRingsProps) {
+  const { t } = useTranslation();
   const weekStart = startOfWeek(new Date(), { weekStartsOn: 1 });
   const now = new Date();
   const todayDow = now.getDay();
   const todayIndex = todayDow === 0 ? 6 : todayDow - 1;
 
   // Aggregate minutes + session count per day
-  const dailyData = DAY_LABELS.map((_, i) => {
+  const dailyData = DAY_LABEL_KEYS.map((_, i) => {
     const day = addDays(weekStart, i);
     const dayStart = new Date(day);
     dayStart.setHours(0, 0, 0, 0);
@@ -49,7 +51,7 @@ export function WeeklyRings({ sessions, targetMinutes, streak }: WeeklyRingsProp
       <Card elevated style={{ gap: 16 }}>
         {/* Ring row */}
         <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-          {DAY_LABELS.map((label, i) => {
+          {DAY_LABEL_KEYS.map((key, i) => {
             const { minutes } = dailyData[i];
             const progress = targetMinutes > 0 ? Math.min(minutes / targetMinutes, 1) : 0;
             const isToday = i === todayIndex;
@@ -69,7 +71,7 @@ export function WeeklyRings({ sessions, targetMinutes, streak }: WeeklyRingsProp
                     color: isToday ? theme.colors.primary : theme.colors.textMuted,
                   }}
                 >
-                  {label}
+                  {t(key)}
                 </Text>
                 <ProgressRing
                   progress={progress}
@@ -115,7 +117,7 @@ export function WeeklyRings({ sessions, targetMinutes, streak }: WeeklyRingsProp
               {weekMinutes}
             </Text>
             <Text style={{ fontFamily: theme.font.body, fontSize: 12, color: theme.colors.textMuted }}>
-              min this week
+              {t('weekly.minThisWeek')}
             </Text>
           </View>
           <View style={{ width: 1, backgroundColor: theme.colors.borderSubtle }} />
@@ -131,7 +133,7 @@ export function WeeklyRings({ sessions, targetMinutes, streak }: WeeklyRingsProp
               {weekSessions}
             </Text>
             <Text style={{ fontFamily: theme.font.body, fontSize: 12, color: theme.colors.textMuted }}>
-              sessions
+              {t('weekly.sessions')}
             </Text>
           </View>
           {streak > 0 && (
@@ -149,7 +151,7 @@ export function WeeklyRings({ sessions, targetMinutes, streak }: WeeklyRingsProp
                   {streak}
                 </Text>
                 <Text style={{ fontFamily: theme.font.body, fontSize: 12, color: theme.colors.textMuted }}>
-                  day streak
+                  {t('weekly.dayStreak')}
                 </Text>
               </View>
             </>

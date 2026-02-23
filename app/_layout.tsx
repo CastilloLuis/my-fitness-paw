@@ -17,6 +17,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useAuth } from '@/src/hooks/use-auth';
 import { theme } from '@/src/theme';
 
+import '@/src/i18n';
 import '@/src/global.css';
 
 SplashScreen.preventAutoHideAsync();

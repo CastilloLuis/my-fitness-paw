@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { Modal, Pressable, ScrollView, Text, View } from 'react-native';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useTranslation } from 'react-i18next';
 
 import { CatFormSheet } from '@/src/components/cats/cat-form-sheet';
 import { Avatar } from '@/src/components/ui/avatar';
@@ -18,6 +19,7 @@ import type { Cat } from '@/src/supabase/types';
 import { theme } from '@/src/theme';
 
 function CatListItem({ cat, onEdit }: { cat: Cat; onEdit: () => void }) {
+  const { t } = useTranslation();
   const { data: sessions } = useSessionsByCat(cat.id);
   const streak = useStreak(sessions);
   const deleteCat = useDeleteCat();
@@ -26,9 +28,9 @@ function CatListItem({ cat, onEdit }: { cat: Cat; onEdit: () => void }) {
   const totalMinutes = sessions?.reduce((s, sess) => s + sess.duration_minutes, 0) ?? 0;
 
   const energyLabels: Record<string, string> = {
-    couch_potato: '\u{1F6CB}\uFE0F Couch Potato',
-    balanced: '\u{2696}\uFE0F Balanced',
-    wild_hunter: '\u{26A1} Wild Hunter',
+    couch_potato: `\u{1F6CB}\uFE0F ${t('cats.couchPotato')}`,
+    balanced: `\u{2696}\uFE0F ${t('cats.balanced')}`,
+    wild_hunter: `\u{26A1} ${t('cats.wildHunter')}`,
   };
 
   return (
@@ -97,7 +99,7 @@ function CatListItem({ cat, onEdit }: { cat: Cat; onEdit: () => void }) {
             color: theme.colors.textMuted,
           }}
         >
-          {totalSessions} sessions - {totalMinutes} min total
+          {t('cats.sessionsMinutes', { sessions: totalSessions, minutes: totalMinutes })}
         </Text>
         <View style={{ flexDirection: 'row', gap: 16 }}>
           <Pressable
@@ -113,7 +115,7 @@ function CatListItem({ cat, onEdit }: { cat: Cat; onEdit: () => void }) {
                 color: theme.colors.primary,
               }}
             >
-              Edit
+              {t('common.edit')}
             </Text>
           </Pressable>
           <Pressable
@@ -129,7 +131,7 @@ function CatListItem({ cat, onEdit }: { cat: Cat; onEdit: () => void }) {
                 color: theme.colors.danger,
               }}
             >
-              Remove
+              {t('common.remove')}
             </Text>
           </Pressable>
         </View>
@@ -139,6 +141,7 @@ function CatListItem({ cat, onEdit }: { cat: Cat; onEdit: () => void }) {
 }
 
 export default function CatsScreen() {
+  const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   const { data: cats, isLoading } = useCats();
   const [showFormSheet, setShowFormSheet] = useState(false);
@@ -185,10 +188,10 @@ export default function CatsScreen() {
               color: theme.colors.text,
             }}
           >
-            My Cats
+            {t('cats.myCats')}
           </Text>
           <Button
-            title="Add"
+            title={t('common.add')}
             onPress={openAdd}
             style={{
               paddingVertical: 8,
@@ -215,9 +218,9 @@ export default function CatsScreen() {
         ) : (
           <EmptyState
             emoji={'\u{1F408}'}
-            title="No cats yet"
-            message="Add your first cat to start tracking their activity!"
-            actionTitle="Add a Cat"
+            title={t('cats.noCatsYet')}
+            message={t('cats.addFirstCatMessage')}
+            actionTitle={t('cats.addACat')}
             onAction={openAdd}
           />
         )}

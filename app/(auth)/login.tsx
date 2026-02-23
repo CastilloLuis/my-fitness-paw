@@ -9,6 +9,7 @@ import {
 import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useTranslation } from 'react-i18next';
 
 import { signIn } from '@/src/supabase/auth';
 import { Input } from '@/src/components/ui/input';
@@ -17,6 +18,7 @@ import { theme } from '@/src/theme';
 
 export default function LoginScreen() {
   const insets = useSafeAreaInsets();
+  const { t } = useTranslation();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -25,11 +27,11 @@ export default function LoginScreen() {
 
   const handleLogin = async () => {
     if (!email.trim()) {
-      setError('Please enter your email');
+      setError(t('auth.errorEnterEmail'));
       return;
     }
     if (!password.trim()) {
-      setError('Please enter your password');
+      setError(t('auth.errorEnterPassword'));
       return;
     }
     setLoading(true);
@@ -38,7 +40,7 @@ export default function LoginScreen() {
       await signIn(email.trim(), password);
       router.replace('/(tabs)');
     } catch (e: any) {
-      setError(e.message || 'Sign in failed. Please try again.');
+      setError(e.message || t('auth.errorSignInFailed'));
     } finally {
       setLoading(false);
     }
@@ -62,7 +64,7 @@ export default function LoginScreen() {
         <Pressable
           onPress={() => router.back()}
           accessibilityRole="button"
-          accessibilityLabel="Go back"
+          accessibilityLabel={t('common.back')}
           hitSlop={12}
           style={{
             width: 40,
@@ -86,7 +88,7 @@ export default function LoginScreen() {
               color: theme.colors.text,
             }}
           >
-            Welcome back
+            {t('auth.welcomeBack')}
           </Text>
           <Text
             style={{
@@ -96,14 +98,14 @@ export default function LoginScreen() {
               marginTop: 6,
             }}
           >
-            Log in to continue tracking
+            {t('auth.logInToContinue')}
           </Text>
         </View>
 
         {/* Form */}
         <View style={{ gap: 16 }}>
           <Input
-            label="Email"
+            label={t('auth.email')}
             value={email}
             onChangeText={(text) => { setEmail(text); setError(''); }}
             autoCapitalize="none"
@@ -113,7 +115,7 @@ export default function LoginScreen() {
             returnKeyType="next"
           />
           <Input
-            label="Password"
+            label={t('auth.password')}
             value={password}
             onChangeText={(text) => { setPassword(text); setError(''); }}
             secureTextEntry={!showPassword}
@@ -126,7 +128,7 @@ export default function LoginScreen() {
                 onPress={() => setShowPassword(!showPassword)}
                 hitSlop={12}
                 accessibilityRole="button"
-                accessibilityLabel={showPassword ? 'Hide password' : 'Show password'}
+                accessibilityLabel={showPassword ? t('auth.hidePassword') : t('auth.showPassword')}
               >
                 <Ionicons
                   name={showPassword ? 'eye-off-outline' : 'eye-outline'}
@@ -164,7 +166,7 @@ export default function LoginScreen() {
 
           {/* Primary CTA */}
           <Button
-            title="Log In"
+            title={t('auth.logIn')}
             onPress={handleLogin}
             loading={loading}
             style={{ marginTop: 8 }}
@@ -178,7 +180,7 @@ export default function LoginScreen() {
             setTimeout(() => router.push('/(auth)/register'), 100);
           }}
           accessibilityRole="button"
-          accessibilityLabel="Create an account"
+          accessibilityLabel={t('auth.createAccount')}
           style={{ marginTop: 24, alignItems: 'center', paddingVertical: 12 }}
         >
           <Text
@@ -188,14 +190,14 @@ export default function LoginScreen() {
               color: theme.colors.textMuted,
             }}
           >
-            Don't have an account?{' '}
+            {t('auth.dontHaveAccount')}
             <Text
               style={{
                 fontFamily: theme.font.bodySemiBold,
                 color: theme.colors.primary,
               }}
             >
-              Create one
+              {t('auth.createOne')}
             </Text>
           </Text>
         </Pressable>

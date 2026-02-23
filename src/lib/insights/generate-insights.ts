@@ -1,5 +1,6 @@
 import type { PlaySession, Cat } from '@/src/supabase/types';
 import { ACTIVITY_TYPES, getActivityType } from '@/src/utils/activity-types';
+import i18n from '@/src/i18n';
 
 export interface InsightCard {
   id: string;
@@ -115,7 +116,7 @@ function activityPreferenceInsight(sessions: PlaySession[]): InsightCard | null 
   return {
     id: 'activity-preference',
     emoji: activity.emoji,
-    headline: `${activity.label} fan`,
+    headline: `${i18n.t(activity.label)} fan`,
     metric: `${pct}% of sessions (${topCount} total)`,
   };
 }
@@ -185,7 +186,6 @@ function consistencyInsight(sessions: PlaySession[]): InsightCard | null {
   const score = Math.round((weeksWithActivity.size / 4) * 100);
   if (score < 50) return null;
 
-  const labels: Record<string, string> = {};
   let label: string;
   if (score === 100) label = 'Perfect consistency';
   else if (score >= 75) label = 'Strong consistency';
