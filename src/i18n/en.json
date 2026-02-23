@@ -285,10 +285,16 @@
     "storyOf": "Story {{current}} of {{total}}",
     "close": "Close story"
   },
+  "community": {
+    "title": "Community",
+    "comingSoon": "Coming Soon",
+    "description": "Connect with other cat owners, follow their journeys, share tips, and celebrate your cats' milestones together."
+  },
   "tabs": {
     "home": "Home",
     "myCats": "My Cats",
     "insights": "Insights",
+    "community": "Community",
     "record": "Record"
   },
   "catFitness": {

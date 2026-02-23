@@ -285,11 +285,17 @@
     "storyOf": "Historia {{current}} de {{total}}",
     "close": "Cerrar historia"
   },
+  "community": {
+    "title": "Manada",
+    "comingSoon": "Pr\u00f3ximamente",
+    "description": "Con\u00e9ctate con otros due\u00f1os de gatos, sigue sus aventuras, comparte consejos y celebra los logros de tus gatos juntos."
+  },
   "tabs": {
     "home": "Inicio",
     "myCats": "Mis Gatos",
     "insights": "Estad\u00edsticas",
-    "record": "Grabar"
+    "community": "Manada",
+    "record": "Jugar"
   },
   "catFitness": {
     "overweightNotes": "Para gatos con sobrepeso (BCS 7), usa sesiones m\u00e1s cortas y frecuentes para reducir el estr\u00e9s articular. Prioriza actividades de bajo impacto. Siempre consulta a un veterinario antes de iniciar un programa de ejercicio para p\u00e9rdida de peso.",

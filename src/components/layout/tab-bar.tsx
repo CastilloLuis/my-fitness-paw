@@ -22,12 +22,14 @@ const TAB_ICONS: Record<string, ImageSource> = {
   index: require('@/assets/icons/castle.png'),
   cats: require('@/assets/icons/cat-face.png'),
   insights: require('@/assets/icons/stats.png'),
+  community: require('@/assets/icons/community.png'),
 };
 
 const TAB_LABEL_KEYS: Record<string, string> = {
   index: 'tabs.home',
   cats: 'tabs.myCats',
   insights: 'tabs.insights',
+  community: 'tabs.community',
 };
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
