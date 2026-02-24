@@ -1,21 +1,24 @@
-import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  Pressable,
-  KeyboardAvoidingView,
-  ScrollView,
-} from 'react-native';
-import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { router } from 'expo-router';
 import { openBrowserAsync } from 'expo-web-browser';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import {
+  KeyboardAvoidingView,
+  Pressable,
+  ScrollView,
+  Text,
+  View,
+} from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { signUp } from '@/src/supabase/auth';
-import { Input } from '@/src/components/ui/input';
 import { Button } from '@/src/components/ui/button';
+import { Input } from '@/src/components/ui/input';
+import { signUp } from '@/src/supabase/auth';
 import { theme } from '@/src/theme';
+
+const TERMS_OF_SERVICE_URL = 'https://www.myfitnesspaw.app/terms';
+const PRIVACY_POLICY_URL = 'https://www.myfitnesspaw.app/privacy-policy';
 
 export default function RegisterScreen() {
   const insets = useSafeAreaInsets();
@@ -275,7 +278,7 @@ export default function RegisterScreen() {
             >
               {t('auth.termsAgree')}
               <Text
-                onPress={() => openBrowserAsync('https://google.com')}
+                onPress={() => openBrowserAsync(TERMS_OF_SERVICE_URL)}
                 style={{
                   fontFamily: theme.font.bodySemiBold,
                   color: theme.colors.primary,
@@ -285,7 +288,7 @@ export default function RegisterScreen() {
               </Text>
               {t('auth.and')}
               <Text
-                onPress={() => openBrowserAsync('https://google.com')}
+                onPress={() => openBrowserAsync(PRIVACY_POLICY_URL)}
                 style={{
                   fontFamily: theme.font.bodySemiBold,
                   color: theme.colors.primary,
