@@ -112,7 +112,9 @@
     "saveChanges": "Save Changes",
     "pleaseName": "Please give your cat a name",
     "failedToAdd": "Failed to add cat",
-    "failedToUpdate": "Failed to update cat"
+    "failedToUpdate": "Failed to update cat",
+    "removeCatTitle": "Remove {{name}}?",
+    "removeCatMessage": "This will permanently delete {{name}} and all their play sessions. This can't be undone."
   },
   "insights": {
     "title": "Insights",

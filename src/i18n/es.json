@@ -112,7 +112,9 @@
     "saveChanges": "Guardar Cambios",
     "pleaseName": "Por favor dale un nombre a tu gato",
     "failedToAdd": "Error al agregar gato",
-    "failedToUpdate": "Error al actualizar gato"
+    "failedToUpdate": "Error al actualizar gato",
+    "removeCatTitle": "\u00bfEliminar a {{name}}?",
+    "removeCatMessage": "Esto eliminar\u00e1 permanentemente a {{name}} y todas sus sesiones de juego. No se puede deshacer."
   },
   "insights": {
     "title": "Estad\u00edsticas",

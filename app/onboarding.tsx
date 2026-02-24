@@ -254,6 +254,8 @@ function CreateCatStep({
   const [age, setAge] = useState('');
   const [nameError, setNameError] = useState('');
 
+  const isFormValid = name.trim().length > 0 && age.trim().length > 0 && weight.trim().length > 0;
+
   const handleAdd = async () => {
     const trimmedName = name.trim();
     if (!trimmedName) {
@@ -265,8 +267,8 @@ function CreateCatStep({
     try {
       await createCat.mutateAsync({
         name: trimmedName,
-        weight_kg: weight ? parseFloat(weight) || null : null,
-        age_years: age ? parseInt(age, 10) || null : null,
+        weight_kg: parseFloat(weight),
+        age_years: parseInt(age, 10),
         emoji: '\u{1F431}',
       });
       playMeow();
@@ -375,18 +377,20 @@ function CreateCatStep({
             <Input
               label={t('onboarding.weight')}
               value={weight}
-              onChangeText={setWeight}
+              onChangeText={(v) => setWeight(v.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1'))}
               keyboardType="decimal-pad"
               returnKeyType="next"
               containerStyle={{ flex: 1 }}
+              maxLength={5}
             />
             <Input
               label={t('onboarding.age')}
               value={age}
-              onChangeText={setAge}
+              onChangeText={(v) => setAge(v.replace(/[^0-9]/g, ''))}
               keyboardType="number-pad"
               returnKeyType="done"
               containerStyle={{ flex: 1 }}
+              maxLength={2}
             />
           </View>
         </Animated.View>
@@ -400,6 +404,7 @@ function CreateCatStep({
             title={t('onboarding.addCat')}
             onPress={handleAdd}
             loading={createCat.isPending}
+            disabled={!isFormValid}
             style={{ width: '100%' }}
           />
         </Animated.View>

@@ -1,6 +1,6 @@
 import { router } from 'expo-router';
 import React, { useState } from 'react';
-import { Modal, Pressable, ScrollView, Text, View } from 'react-native';
+import { Alert, Modal, Pressable, ScrollView, Text, View } from 'react-native';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
@@ -119,7 +119,20 @@ function CatListItem({ cat, onEdit }: { cat: Cat; onEdit: () => void }) {
             </Text>
           </Pressable>
           <Pressable
-            onPress={() => deleteCat.mutate(cat.id)}
+            onPress={() => {
+              Alert.alert(
+                t('cats.removeCatTitle', { name: cat.name }),
+                t('cats.removeCatMessage', { name: cat.name }),
+                [
+                  { text: t('common.cancel'), style: 'cancel' },
+                  {
+                    text: t('common.remove'),
+                    style: 'destructive',
+                    onPress: () => deleteCat.mutate(cat.id),
+                  },
+                ]
+              );
+            }}
             accessibilityRole="button"
             accessibilityLabel={`Delete ${cat.name}`}
             hitSlop={12}

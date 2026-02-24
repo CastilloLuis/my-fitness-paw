@@ -69,8 +69,8 @@ export function CatFormSheet({ onClose, cat }: CatFormSheetProps) {
     const catData = {
       name: name.trim(),
       breed: breed.trim() || null,
-      age_years: ageYears ? parseInt(ageYears, 10) : null,
-      weight_kg: weightKg ? parseFloat(weightKg) : null,
+      age_years: parseInt(ageYears, 10),
+      weight_kg: parseFloat(weightKg),
       energy_level: energyLevel,
       emoji: '\u{1F431}',
       image_base64: imageBase64,
@@ -92,6 +92,7 @@ export function CatFormSheet({ onClose, cat }: CatFormSheetProps) {
   };
 
   const isPending = createCat.isPending || updateCat.isPending;
+  const isFormValid = name.trim().length > 0 && ageYears.trim().length > 0 && weightKg.trim().length > 0;
   const photoSize = 100;
 
   return (
@@ -189,16 +190,18 @@ export function CatFormSheet({ onClose, cat }: CatFormSheetProps) {
             <Input
               label={t('cats.ageYears')}
               value={ageYears}
-              onChangeText={setAgeYears}
+              onChangeText={(v) => setAgeYears(v.replace(/[^0-9]/g, ''))}
               keyboardType="number-pad"
+              maxLength={2}
             />
           </View>
           <View style={{ flex: 1 }}>
             <Input
               label={t('cats.weightKg')}
               value={weightKg}
-              onChangeText={setWeightKg}
+              onChangeText={(v) => setWeightKg(v.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1'))}
               keyboardType="decimal-pad"
+              maxLength={5}
             />
           </View>
         </View>
@@ -288,6 +291,7 @@ export function CatFormSheet({ onClose, cat }: CatFormSheetProps) {
             title={isEdit ? t('cats.saveChanges') : t('onboarding.addCat')}
             onPress={handleSave}
             loading={isPending}
+            disabled={!isFormValid}
           />
           <Button title={t('common.cancel')} onPress={onClose} variant="ghost" />
         </View>
