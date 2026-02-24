@@ -11,7 +11,7 @@ const plusJakarta = Plus_Jakarta_Sans({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://myfitnesspaw.com"),
+  metadataBase: new URL("https://www.myfitnesspaw.app"),
   title: {
     default: "MyFitnessPaw — Track Your Cat's Fitness Journey",
     template: "%s | MyFitnessPaw",
@@ -48,7 +48,7 @@ export const metadata: Metadata = {
     locale: "en_US",
     alternateLocale: "es_ES",
     siteName: "MyFitnessPaw",
-    url: "https://myfitnesspaw.com",
+    url: "https://www.myfitnesspaw.app",
     images: [
       {
         url: "/images/og-image.jpg",
