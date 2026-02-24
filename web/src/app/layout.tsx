@@ -51,19 +51,19 @@ export const metadata: Metadata = {
     url: "https://myfitnesspaw.com",
     images: [
       {
-        url: "/images/icon.png",
-        width: 512,
-        height: 512,
-        alt: "MyFitnessPaw — Cat paw holding a dumbbell",
+        url: "/images/media.png",
+        width: 1200,
+        height: 630,
+        alt: "MyFitnessPaw — Keep Your Cat Fit & Happy!",
       },
     ],
   },
   twitter: {
-    card: "summary",
+    card: "summary_large_image",
     title: "MyFitnessPaw — Track Your Cat's Fitness Journey",
     description:
       "The playful way to keep your cat active and healthy. Track play sessions and celebrate milestones.",
-    images: ["/images/icon.png"],
+    images: ["/images/media.png"],
   },
 };
 
