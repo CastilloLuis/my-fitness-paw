@@ -91,8 +91,9 @@ export const es: DeepString<typeof en> = {
   downloadCta: {
     badge: "Descarga Gratuita",
     title: "\u00danete a la Manada",
-    subtitle:
-      "Descarga MyFitnessPaw hoy y comienza a rastrear el fitness de tu gato. Es gratis, divertido, y tu gato te lo agradecer\u00e1 con ronroneos extra.",
+    subtitlePre: "Descarga",
+    subtitlePost:
+      "hoy y comienza a rastrear el fitness de tu gato. Es gratis, divertido, y tu gato te lo agradecer\u00e1 con ronroneos extra.",
     downloadIos: "Descargar para iOS",
     androidComingSoon: "Android Pr\u00f3ximamente",
     imageAlt: "Dos gatos jugando juntos con estambre y pesas",

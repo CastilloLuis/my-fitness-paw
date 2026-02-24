@@ -88,7 +88,11 @@ export default function DownloadCta() {
             </h2>
 
             <p className="mt-4 max-w-md text-[17px] leading-relaxed text-white/80">
-              {t("downloadCta.subtitle")}
+              {t("downloadCta.subtitlePre")}{" "}
+              <span className="font-bold text-white underline decoration-ginger-400/50 decoration-2 underline-offset-2">
+                MyFitnessPaw
+              </span>{" "}
+              {t("downloadCta.subtitlePost")}
             </p>
 
             <div className="mt-8 flex flex-col sm:flex-row items-center gap-3 justify-center lg:justify-start">

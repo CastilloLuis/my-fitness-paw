@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { useTranslation } from "@/i18n";
 
 const socialIcons = [
@@ -52,7 +53,7 @@ export default function Footer() {
         <div className="flex flex-col items-center gap-8 md:flex-row md:justify-between md:items-start">
           {/* Brand */}
           <div className="flex flex-col items-center md:items-start gap-3">
-            <a href="#" className="flex items-center gap-2.5 group">
+            <Link href="/" className="flex items-center gap-2.5 group">
               <Image
                 src="/images/paw.png"
                 alt="MyFitnessPaw"
@@ -64,7 +65,7 @@ export default function Footer() {
                 MyFitness
                 <span className="text-ginger-400">Paw</span>
               </span>
-            </a>
+            </Link>
             <p className="text-sm text-ivory-100/60 max-w-xs text-center md:text-left">
               {t("footer.tagline")}
             </p>

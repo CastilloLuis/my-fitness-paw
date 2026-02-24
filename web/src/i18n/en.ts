@@ -87,8 +87,9 @@ export const en = {
   downloadCta: {
     badge: "Free Download",
     title: "Join the Pack",
-    subtitle:
-      "Download MyFitnessPaw today and start tracking your cat\u2019s fitness journey. It\u2019s free, fun, and your cat will thank you with extra purrs.",
+    subtitlePre: "Download",
+    subtitlePost:
+      "today and start tracking your cat\u2019s fitness journey. It\u2019s free, fun, and your cat will thank you with extra purrs.",
     downloadIos: "Download for iOS",
     androidComingSoon: "Android Coming Soon",
     imageAlt: "Two cats playing together with yarn and dumbbells",

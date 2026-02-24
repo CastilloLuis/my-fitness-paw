@@ -2,14 +2,58 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { motion, AnimatePresence } from "motion/react";
 import { useTranslation } from "@/i18n";
 import LanguageToggle from "./language-toggle";
+
+const CAT_POOL = ["🐱", "😺", "😸", "🐈", "🐈‍⬛"];
+
+function pickRandom(count: number) {
+  const shuffled = [...CAT_POOL].sort(() => Math.random() - 0.5);
+  return shuffled.slice(0, count);
+}
+
+const SLOT_OFFSETS = ["-0.4em", "0.8em", "2em"];
+
+function BouncingCats({ visible }: { visible: boolean }) {
+  const [cats, setCats] = useState<string[]>([]);
+
+  useEffect(() => {
+    if (visible) setCats(pickRandom(3));
+  }, [visible]);
+
+  return (
+    <span className="pointer-events-none absolute left-0 right-0 top-full">
+      <AnimatePresence>
+        {visible &&
+          cats.map((emoji, i) => (
+            <motion.span
+              key={`${emoji}-${i}`}
+              initial={{ opacity: 0, scale: 0.3, y: 4 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.3, y: 4 }}
+              transition={{
+                duration: 0.35,
+                delay: i * 0.06,
+                ease: [0.22, 1, 0.36, 1],
+              }}
+              className="absolute text-sm select-none"
+              style={{ left: `calc(50% + ${SLOT_OFFSETS[i]})` }}
+            >
+              {emoji}
+            </motion.span>
+          ))}
+      </AnimatePresence>
+    </span>
+  );
+}
 
 export default function Navbar() {
   const { t } = useTranslation();
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [logoHovered, setLogoHovered] = useState(false);
 
   const links = [
     { label: t("navbar.features"), href: "#features" },
@@ -43,7 +87,12 @@ export default function Navbar() {
       >
         <div className="mx-auto flex h-18 max-w-6xl items-center justify-between px-6">
           {/* Logo */}
-          <a href="#" className="flex items-center gap-2.5 group">
+          <Link
+            href="/"
+            className="relative flex items-center gap-2.5 group"
+            onMouseEnter={() => setLogoHovered(true)}
+            onMouseLeave={() => setLogoHovered(false)}
+          >
             <Image
               src="/images/paw.png"
               alt="MyFitnessPaw"
@@ -51,11 +100,12 @@ export default function Navbar() {
               height={36}
               className="transition-transform duration-300 group-hover:rotate-[-8deg] group-hover:scale-110"
             />
-            <span className="text-lg font-extrabold tracking-tight text-ink-900">
+            <span className="relative text-lg font-extrabold tracking-tight text-ink-900">
               MyFitness
               <span className="text-ginger-600">Paw</span>
+              <BouncingCats visible={logoHovered} />
             </span>
-          </a>
+          </Link>
 
           {/* Desktop links */}
           <div className="hidden md:flex items-center gap-8">
