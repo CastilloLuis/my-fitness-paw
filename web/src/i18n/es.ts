@@ -109,6 +109,22 @@ export const es: DeepString<typeof en> = {
     madeWith: "Hecho con \ud83d\udc3e para amantes de los gatos",
   },
 
+  contact: {
+    badge: "Soporte",
+    title: "Contáctanos",
+    subtitle: "¿Tienes una pregunta o comentario? Nos encantaría saber de ti.",
+    subjectLabel: "Asunto",
+    subjectPlaceholder: "¿De qué se trata?",
+    messageLabel: "Mensaje",
+    messagePlaceholder: "Cuéntanos cómo podemos ayudarte...",
+    send: "Enviar Mensaje",
+    sending: "Enviando...",
+    successTitle: "¡Mensaje Enviado!",
+    successMessage: "Gracias por escribirnos. Te responderemos pronto.",
+    sendAnother: "Enviar otro mensaje",
+    errorMessage: "Algo salió mal. Por favor, inténtalo de nuevo.",
+  },
+
   legal: {
     trackJourney: "Rastrea el fitness de tu gato",
     termsOfService: "T\u00e9rminos de Servicio",

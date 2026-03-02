@@ -28,7 +28,7 @@ export default function Footer() {
   const footerLinks = [
     { label: t("footer.privacyPolicy"), href: "/privacy-policy" },
     { label: t("footer.termsOfService"), href: "/terms" },
-    { label: t("footer.contact"), href: "mailto:contact@myfitnesspaw.com" },
+    { label: t("footer.contact"), href: "/contact" },
   ];
 
   return (

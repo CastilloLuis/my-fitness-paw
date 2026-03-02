@@ -104,6 +104,22 @@ export const en = {
     madeWith: "Made with \ud83d\udc3e for cat lovers",
   },
 
+  contact: {
+    badge: "Support",
+    title: "Contact Us",
+    subtitle: "Have a question or feedback? We'd love to hear from you.",
+    subjectLabel: "Subject",
+    subjectPlaceholder: "What's this about?",
+    messageLabel: "Message",
+    messagePlaceholder: "Tell us how we can help...",
+    send: "Send Message",
+    sending: "Sending...",
+    successTitle: "Message Sent!",
+    successMessage: "Thanks for reaching out. We'll get back to you soon.",
+    sendAnother: "Send another message",
+    errorMessage: "Something went wrong. Please try again.",
+  },
+
   legal: {
     trackJourney: "Track your cat\u2019s fitness journey",
     termsOfService: "Terms of Service",
