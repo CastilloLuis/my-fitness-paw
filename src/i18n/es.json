@@ -113,6 +113,9 @@
     "pleaseName": "Por favor dale un nombre a tu gato",
     "failedToAdd": "Error al agregar gato",
     "failedToUpdate": "Error al actualizar gato",
+    "photos": "Fotos",
+    "avatar": "Avatar",
+    "firstPhotoAvatar": "La primera foto se usa como avatar",
     "removeCatTitle": "\u00bfEliminar a {{name}}?",
     "removeCatMessage": "Esto eliminar\u00e1 permanentemente a {{name}} y todas sus sesiones de juego. No se puede deshacer."
   },
@@ -292,8 +295,25 @@
   },
   "community": {
     "title": "Manada",
-    "comingSoon": "Pr\u00f3ximamente",
-    "description": "Con\u00e9ctate con otros due\u00f1os de gatos, sigue sus aventuras, comparte consejos y celebra los logros de tus gatos juntos."
+    "feedEmpty": "¡La manada está calentando!",
+    "feedEmptyMessage": "Las sesiones de juego de la comunidad aparecerán aquí. ¡Registra una sesión y sé el primero en compartir!",
+    "played": "Jugó",
+    "minSession": "min de sesión",
+    "purr": "ronroneo",
+    "purrs": "ronroneos",
+    "anonymous": "Amante de Gatos",
+    "loadingMore": "Cargando más...",
+    "comments": "Comentarios",
+    "noComments": "Sin comentarios aún. ¡Sé el primero!",
+    "addComment": "Añade un comentario...",
+    "send": "Enviar",
+    "reply": "Responder",
+    "replyingTo": "Respondiendo a {{name}}",
+    "shareToFeed": "¿Compartir en la Comunidad?",
+    "sharePrompt": "Tu sesión de juego con {{catName}} aparecerá en el feed de la comunidad.",
+    "share": "Compartir",
+    "notNow": "Ahora no",
+    "with": "con"
   },
   "tabs": {
     "home": "Inicio",

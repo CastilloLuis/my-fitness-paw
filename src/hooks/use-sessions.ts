@@ -60,6 +60,7 @@ export function useCreateSession() {
       cancelAllReminders();
       // Refetch ALL session queries (matches any key starting with ['sessions'])
       await queryClient.refetchQueries({ queryKey: ['sessions'] });
+      queryClient.invalidateQueries({ queryKey: ['feed'] });
     },
   });
 }
