@@ -18,4 +18,8 @@ export const queryKeys = {
   appConfig: {
     all: ['appConfig'] as const,
   },
+  feed: {
+    all: ['feed'] as const,
+    comments: (postId: string) => ['feed', 'comments', postId] as const,
+  },
 };

@@ -5,6 +5,7 @@ import {
   TextInput,
   ScrollView,
   Pressable,
+  Alert,
 } from 'react-native';
 import Animated, {
   FadeInDown,
@@ -25,6 +26,7 @@ import { useTranslation } from 'react-i18next';
 
 import { useCats } from '@/src/hooks/use-cats';
 import { useCreateSession } from '@/src/hooks/use-sessions';
+import { usePublishFeedPost } from '@/src/hooks/use-feed';
 import { usePlaySafety } from '@/src/hooks/use-play-safety';
 import { useLiveSessionStore } from '@/src/stores/live-session-store';
 import { CatPicker } from '@/src/components/cats/cat-picker';
@@ -336,6 +338,7 @@ export default function LiveSessionScreen() {
   const insets = useSafeAreaInsets();
   const { data: cats, isLoading: catsLoading } = useCats();
   const createSession = useCreateSession();
+  const publishPost = usePublishFeedPost();
   const liveStore = useLiveSessionStore();
 
   const [phase, setPhase] = useState<Phase>(() =>
@@ -466,7 +469,7 @@ export default function LiveSessionScreen() {
     const durationMinutes = Math.max(1, Math.round(finalElapsedMs / 60000));
 
     try {
-      await createSession.mutateAsync({
+      const session = await createSession.mutateAsync({
         cat_id: selectedCatId,
         activity_type: selectedActivity,
         duration_minutes: durationMinutes,
@@ -478,11 +481,30 @@ export default function LiveSessionScreen() {
       }
 
       liveStore.clear();
-      setPhase('success');
+
+      const catName = cats?.find((c) => c.id === selectedCatId)?.name ?? '';
+      Alert.alert(
+        t('community.shareToFeed'),
+        t('community.sharePrompt', { catName }),
+        [
+          {
+            text: t('community.notNow'),
+            style: 'cancel',
+            onPress: () => setPhase('success'),
+          },
+          {
+            text: t('community.share'),
+            onPress: () => {
+              publishPost.mutate(session.id);
+              setPhase('success');
+            },
+          },
+        ]
+      );
     } catch (e: any) {
       setError(e.message || t('session.failedToSave'));
     }
-  }, [selectedCatId, selectedActivity, finalElapsedMs, notes, createSession, liveStore, t]);
+  }, [selectedCatId, selectedActivity, finalElapsedMs, notes, createSession, publishPost, liveStore, cats, t]);
 
   const handleSuccessComplete = useCallback(() => {
     router.back();

@@ -17,6 +17,7 @@ import { Image } from 'expo-image';
 
 import { useCats } from '@/src/hooks/use-cats';
 import { useCreateSession } from '@/src/hooks/use-sessions';
+import { usePublishFeedPost } from '@/src/hooks/use-feed';
 import { ACTIVITY_TYPES } from '@/src/utils/activity-types';
 import { Avatar } from '@/src/components/ui/avatar';
 import { Input } from '@/src/components/ui/input';
@@ -29,6 +30,7 @@ export default function ManualLogScreen() {
   const insets = useSafeAreaInsets();
   const { data: cats, isLoading: catsLoading } = useCats();
   const createSession = useCreateSession();
+  const publishPost = usePublishFeedPost();
 
   const [selectedCatId, setSelectedCatId] = useState<string | null>(null);
   const [selectedActivity, setSelectedActivity] = useState<string | null>(null);
@@ -57,7 +59,7 @@ export default function ManualLogScreen() {
 
     setError('');
     try {
-      await createSession.mutateAsync({
+      const session = await createSession.mutateAsync({
         cat_id: selectedCatId,
         activity_type: selectedActivity,
         duration_minutes: mins,
@@ -66,7 +68,21 @@ export default function ManualLogScreen() {
       if (process.env.EXPO_OS === 'ios') {
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       }
-      router.back();
+      const catName = cats?.find((c) => c.id === selectedCatId)?.name ?? '';
+      Alert.alert(
+        t('community.shareToFeed'),
+        t('community.sharePrompt', { catName }),
+        [
+          { text: t('community.notNow'), style: 'cancel', onPress: () => router.back() },
+          {
+            text: t('community.share'),
+            onPress: () => {
+              publishPost.mutate(session.id);
+              router.back();
+            },
+          },
+        ]
+      );
     } catch (e: any) {
       Alert.alert(t('common.error'), e.message || t('session.failedToSave'));
     }

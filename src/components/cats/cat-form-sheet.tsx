@@ -9,6 +9,7 @@ import {
 import * as Haptics from 'expo-haptics';
 import * as ImagePicker from 'expo-image-picker';
 import { Image } from 'expo-image';
+import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import { Input } from '@/src/components/ui/input';
 import { Button } from '@/src/components/ui/button';
@@ -27,6 +28,75 @@ interface CatFormSheetProps {
   cat?: Cat;
 }
 
+const SLOT_SIZE = 90;
+
+function PhotoSlot({
+  image,
+  onPick,
+  onRemove,
+  label,
+}: {
+  image: string | null;
+  onPick: () => void;
+  onRemove: () => void;
+  label?: string;
+}) {
+  return (
+    <View style={{ alignItems: 'center', gap: 6 }}>
+      <Pressable
+        onPress={onPick}
+        accessibilityRole="button"
+        style={{
+          width: SLOT_SIZE,
+          height: SLOT_SIZE,
+          borderRadius: theme.radius.md,
+          backgroundColor: theme.colors.cream200,
+          alignItems: 'center',
+          justifyContent: 'center',
+          borderCurve: 'continuous',
+          overflow: 'hidden',
+          borderWidth: image ? 0 : 2,
+          borderColor: theme.colors.borderSubtle,
+          borderStyle: 'dashed',
+        }}
+      >
+        {image ? (
+          <Image
+            source={{ uri: `data:image/jpeg;base64,${image}` }}
+            style={{ width: SLOT_SIZE, height: SLOT_SIZE }}
+            contentFit="cover"
+          />
+        ) : (
+          <Ionicons name="camera-outline" size={28} color={theme.colors.textMuted} />
+        )}
+      </Pressable>
+      {image ? (
+        <Pressable onPress={onRemove} hitSlop={8}>
+          <Text
+            style={{
+              fontFamily: theme.font.body,
+              fontSize: 11,
+              color: theme.colors.danger,
+            }}
+          >
+            {'\u2715'}
+          </Text>
+        </Pressable>
+      ) : (
+        <Text
+          style={{
+            fontFamily: theme.font.body,
+            fontSize: 11,
+            color: theme.colors.textMuted,
+          }}
+        >
+          {label ?? ''}
+        </Text>
+      )}
+    </View>
+  );
+}
+
 export function CatFormSheet({ onClose, cat }: CatFormSheetProps) {
   const { t } = useTranslation();
   const isEdit = !!cat;
@@ -36,13 +106,17 @@ export function CatFormSheet({ onClose, cat }: CatFormSheetProps) {
   const [ageYears, setAgeYears] = useState(cat?.age_years?.toString() ?? '');
   const [weightKg, setWeightKg] = useState(cat?.weight_kg?.toString() ?? '');
   const [energyLevel, setEnergyLevel] = useState<EnergyLevel>(cat?.energy_level ?? 'balanced');
-  const [imageBase64, setImageBase64] = useState<string | null>(cat?.image_base64 ?? null);
+  const [images, setImages] = useState<(string | null)[]>([
+    cat?.image_base64 ?? null,
+    cat?.image_base64_2 ?? null,
+    cat?.image_base64_3 ?? null,
+  ]);
   const [error, setError] = useState('');
 
   const createCat = useCreateCat();
   const updateCat = useUpdateCat();
 
-  const pickImage = async () => {
+  const pickImage = async (index: number) => {
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ['images'],
       allowsEditing: true,
@@ -53,11 +127,23 @@ export function CatFormSheet({ onClose, cat }: CatFormSheetProps) {
     });
 
     if (!result.canceled && result.assets[0].base64) {
-      setImageBase64(result.assets[0].base64);
+      setImages((prev) => {
+        const next = [...prev];
+        next[index] = result.assets[0].base64!;
+        return next;
+      });
       if (process.env.EXPO_OS === 'ios') {
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
       }
     }
+  };
+
+  const removeImage = (index: number) => {
+    setImages((prev) => {
+      const next = [...prev];
+      next[index] = null;
+      return next;
+    });
   };
 
   const handleSave = async () => {
@@ -73,7 +159,9 @@ export function CatFormSheet({ onClose, cat }: CatFormSheetProps) {
       weight_kg: parseFloat(weightKg),
       energy_level: energyLevel,
       emoji: '\u{1F431}',
-      image_base64: imageBase64,
+      image_base64: images[0],
+      image_base64_2: images[1],
+      image_base64_3: images[2],
     };
 
     try {
@@ -93,7 +181,6 @@ export function CatFormSheet({ onClose, cat }: CatFormSheetProps) {
 
   const isPending = createCat.isPending || updateCat.isPending;
   const isFormValid = name.trim().length > 0 && ageYears.trim().length > 0 && weightKg.trim().length > 0;
-  const photoSize = 100;
 
   return (
     <KeyboardAvoidingView
@@ -118,63 +205,44 @@ export function CatFormSheet({ onClose, cat }: CatFormSheetProps) {
           {isEdit ? t('cats.editCat') : t('cats.addNewCat')}
         </Text>
 
-        {/* Photo section */}
-        <View style={{ alignItems: 'center', gap: 12 }}>
-          <Pressable
-            onPress={pickImage}
-            accessibilityRole="button"
-            accessibilityLabel={imageBase64 ? t('cats.changePhoto') : t('cats.addPhoto')}
+        {/* Photo section — 3 slots */}
+        <View style={{ gap: 8 }}>
+          <Text
             style={{
-              width: photoSize,
-              height: photoSize,
-              borderRadius: photoSize / 2,
-              backgroundColor: theme.colors.cream200,
-              alignItems: 'center',
-              justifyContent: 'center',
-              borderCurve: 'continuous',
-              overflow: 'hidden',
-              borderWidth: 2,
-              borderColor: theme.colors.borderSubtle,
-              borderStyle: 'dashed',
+              fontFamily: theme.font.bodyMedium,
+              fontSize: 14,
+              color: theme.colors.textMuted,
             }}
           >
-            {imageBase64 ? (
-              <Image
-                source={{ uri: `data:image/jpeg;base64,${imageBase64}` }}
-                style={{ width: photoSize, height: photoSize }}
-                contentFit="cover"
+            {t('cats.photos')}
+          </Text>
+          <View
+            style={{
+              flexDirection: 'row',
+              justifyContent: 'center',
+              gap: 12,
+            }}
+          >
+            {images.map((img, i) => (
+              <PhotoSlot
+                key={i}
+                image={img}
+                onPick={() => pickImage(i)}
+                onRemove={() => removeImage(i)}
+                label={i === 0 ? t('cats.avatar') : undefined}
               />
-            ) : (
-              <Text style={{ fontSize: 40 }}>{'\u{1F431}'}</Text>
-            )}
-          </Pressable>
-          <Pressable onPress={pickImage} hitSlop={8}>
-            <Text
-              style={{
-                fontFamily: theme.font.bodyMedium,
-                fontSize: 14,
-                color: theme.colors.primary,
-              }}
-            >
-              {imageBase64 ? t('cats.changePhoto') : t('cats.addPhoto')}
-            </Text>
-          </Pressable>
-          {imageBase64 && (
-            <Pressable
-              onPress={() => setImageBase64(null)}
-              hitSlop={8}
-            >
-              <Text
-                style={{
-                  fontFamily: theme.font.body,
-                  fontSize: 13,
-                  color: theme.colors.danger,
-                }}
-              >
-                {t('cats.removePhoto')}
-              </Text>
-            </Pressable>
-          )}
+            ))}
+          </View>
+          <Text
+            style={{
+              fontFamily: theme.font.body,
+              fontSize: 12,
+              color: theme.colors.textMuted,
+              textAlign: 'center',
+            }}
+          >
+            {t('cats.firstPhotoAvatar')}
+          </Text>
         </View>
 
         <Input

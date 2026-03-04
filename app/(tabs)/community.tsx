@@ -1,32 +1,31 @@
-import React from 'react';
-import { Text, View } from 'react-native';
+import { FeedCard } from '@/src/components/feed/feed-card';
+import { FeedSkeleton } from '@/src/components/feed/feed-skeleton';
+import { CommentsSheet } from '@/src/components/feed/comments-sheet';
+import { useFeed, useTogglePurr } from '@/src/hooks/use-feed';
+import type { FeedPostWithDetails } from '@/src/supabase/types';
+import { theme } from '@/src/theme';
 import { Image } from 'expo-image';
+import React, { useCallback, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { ActivityIndicator, FlatList, RefreshControl, Text, View } from 'react-native';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useTranslation } from 'react-i18next';
-import { theme } from '@/src/theme';
 
 const BG_GRADIENT =
   'linear-gradient(165deg, #FBFAF7 0%, #F3EFE7 25%, #F2B36D22 50%, #E98A2A18 75%, #FBFAF7 100%)';
-const BADGE_GRADIENT =
-  'linear-gradient(135deg, #F5A035 0%, #EE7E2E 40%, #D96825 100%)';
 const GLOW_GRADIENT =
   'radial-gradient(circle, #F2B36D30 0%, #F2B36D00 70%)';
 
-export default function CommunityScreen() {
+function FeedEmpty() {
   const { t } = useTranslation();
-  const insets = useSafeAreaInsets();
 
   return (
     <View
       style={{
-        ...({ experimental_backgroundImage: BG_GRADIENT } as any),
-        flex: 1,
         alignItems: 'center',
         justifyContent: 'center',
-        paddingHorizontal: theme.spacing.lg,
-        paddingTop: insets.top,
-        paddingBottom: insets.bottom + 120,
+        paddingTop: 40,
+        paddingBottom: 40,
       }}
     >
       {/* Soft glow behind image */}
@@ -34,64 +33,36 @@ export default function CommunityScreen() {
         style={{
           ...({ experimental_backgroundImage: GLOW_GRADIENT } as any),
           position: 'absolute',
-          width: 320,
-          height: 320,
-          borderRadius: 160,
-          top: '25%',
+          width: 280,
+          height: 280,
+          borderRadius: 140,
+          top: 20,
         }}
       />
 
-      {/* Image */}
       <Animated.View entering={FadeInDown.delay(0).duration(500)}>
         <Image
           source={require('@/assets/icons/community-playing.png')}
-          style={{ width: 280, height: 280, marginBottom: 8 }}
+          style={{ width: 200, height: 150, marginTop: 100 }}
           contentFit="contain"
         />
       </Animated.View>
 
-      {/* Coming Soon badge */}
       <Animated.View entering={FadeInDown.delay(150).duration(500)}>
-        <View
-          style={{
-            ...({ experimental_backgroundImage: BADGE_GRADIENT } as any),
-            paddingHorizontal: 20,
-            paddingVertical: 8,
-            borderRadius: theme.radius.full,
-            marginBottom: 20,
-          }}
-        >
-          <Text
-            style={{
-              fontFamily: theme.font.displayBold,
-              fontSize: 14,
-              color: theme.colors.ivory50,
-              letterSpacing: 1.5,
-              textTransform: 'uppercase',
-            }}
-          >
-            {t('community.comingSoon')}
-          </Text>
-        </View>
-      </Animated.View>
-
-      {/* Title */}
-      <Animated.View entering={FadeInDown.delay(250).duration(500)}>
         <Text
           style={{
             fontFamily: theme.font.display,
-            fontSize: 26,
+            fontSize: 22,
             color: theme.colors.text,
             textAlign: 'center',
-            marginBottom: 12,
+            marginBottom: 10,
           }}
         >
-          {t('community.title')}
+          {t('community.feedEmpty')}
         </Text>
       </Animated.View>
 
-      {/* Description */}
-      <Animated.View entering={FadeInDown.delay(350).duration(500)}>
+      <Animated.View entering={FadeInDown.delay(250).duration(500)}>
         <Text
           style={{
             fontFamily: theme.font.body,
@@ -99,12 +70,147 @@ export default function CommunityScreen() {
             color: theme.colors.textMuted,
             textAlign: 'center',
             lineHeight: 22,
-            maxWidth: 300,
+            maxWidth: 280,
           }}
         >
-          {t('community.description')}
+          {t('community.feedEmptyMessage')}
         </Text>
       </Animated.View>
+    </View>
+  );
+}
+
+export default function CommunityScreen() {
+  const { t } = useTranslation();
+  const insets = useSafeAreaInsets();
+  const {
+    data,
+    isLoading,
+    error,
+    isFetchingNextPage,
+    hasNextPage,
+    fetchNextPage,
+    refetch,
+    isRefetching,
+  } = useFeed();
+
+  if (__DEV__ && error) {
+    console.error('[Feed]', error);
+  }
+  const { mutate: togglePurr } = useTogglePurr();
+
+  const [commentsPostId, setCommentsPostId] = useState<string | null>(null);
+
+  const posts = data?.pages.flatMap((page) => page.posts) ?? [];
+
+  const handlePurr = useCallback(
+    (postId: string) => togglePurr(postId),
+    [togglePurr]
+  );
+
+  const handleComment = useCallback((postId: string) => {
+    setCommentsPostId(postId);
+  }, []);
+
+  const handleEndReached = useCallback(() => {
+    if (hasNextPage && !isFetchingNextPage) {
+      fetchNextPage();
+    }
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
+
+  const renderItem = useCallback(
+    ({ item }: { item: FeedPostWithDetails }) => (
+      <FeedCard post={item} onPurr={handlePurr} onComment={handleComment} />
+    ),
+    [handlePurr, handleComment]
+  );
+
+  if (isLoading) {
+    return (
+      <View
+        style={{
+          flex: 1,
+          backgroundColor: theme.colors.bg,
+          paddingTop: insets.top,
+        }}
+      >
+        <View style={{ paddingHorizontal: theme.spacing.md, paddingTop: theme.spacing.md, paddingBottom: theme.spacing.sm }}>
+          <Text
+            style={{
+              fontFamily: theme.font.display,
+              fontSize: 28,
+              color: theme.colors.text,
+            }}
+          >
+            {t('community.title')}
+          </Text>
+        </View>
+        <FeedSkeleton />
+      </View>
+    );
+  }
+
+  const isEmpty = posts.length === 0;
+
+  return (
+    <View
+      style={{
+        ...({ experimental_backgroundImage: isEmpty ? BG_GRADIENT : undefined } as any),
+        flex: 1,
+        backgroundColor: isEmpty ? undefined : theme.colors.bg,
+        paddingTop: insets.top,
+      }}
+    >
+      <FlatList
+        data={posts}
+        keyExtractor={(item) => item.id}
+        renderItem={renderItem}
+        contentContainerStyle={{
+          padding: theme.spacing.md,
+          paddingBottom: insets.bottom + 120,
+          gap: theme.spacing.md,
+          ...(isEmpty && { flex: 1 }),
+        }}
+        ListHeaderComponent={
+          <Text
+            style={{
+              fontFamily: theme.font.display,
+              fontSize: 28,
+              color: theme.colors.text,
+              marginBottom: theme.spacing.xs,
+            }}
+          >
+            {t('community.title')}
+          </Text>
+        }
+        ListEmptyComponent={<FeedEmpty />}
+        ListFooterComponent={
+          isFetchingNextPage ? (
+            <ActivityIndicator
+              size="small"
+              color={theme.colors.primary}
+              style={{ paddingVertical: theme.spacing.md }}
+            />
+          ) : null
+        }
+        refreshControl={
+          <RefreshControl
+            refreshing={isRefetching}
+            onRefresh={refetch}
+            tintColor={theme.colors.primary}
+          />
+        }
+        onEndReached={handleEndReached}
+        onEndReachedThreshold={0.5}
+        showsVerticalScrollIndicator={false}
+      />
+
+      {commentsPostId && (
+        <CommentsSheet
+          postId={commentsPostId}
+          onClose={() => setCommentsPostId(null)}
+        />
+      )}
     </View>
   );
 }
